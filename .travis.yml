@@ -46,7 +46,7 @@ install:
 before_script:
     - export PATH=`pwd`:$PATH
 
-script: Rscript -e 'suppressPackageStartupMessages(library(monocle)); stopifnot(packageVersion("monocle")=="2.99.3")'
+script: Rscript -e 'suppressPackageStartupMessages(library(monocle)); stopifnot(packageVersion("monocle")=="2.99.3")' && ./monocle-scripts-post-install-tests.bats
 
 cache:
   directories:

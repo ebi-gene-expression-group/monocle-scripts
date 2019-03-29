@@ -31,7 +31,7 @@ before_install:
     if test -e $HOME/miniconda/envs/${TEST_ENV}; then
         echo "${TEST_ENV} already created.";
     else
-      conda create -n ${TEST_ENV} python=$TRAVIS_PYTHON_VERSION bioconductor-monocle=2.10.0 bioconductor-delayedmatrixstats bioconductor-iranges louvain r-doparallel r-future r-ggridges r-glmnet r-globals r-htmltools r-htmlwidgets r-listenv r-lpsolveapi r-pbapply r-plotly r-reticulate r-rgl r-spdep r-tidyr umap-learn;
+      conda create -n ${TEST_ENV} python=$TRAVIS_PYTHON_VERSION bioconductor-monocle=2.10.0 bioconductor-delayedmatrixstats bioconductor-iranges louvain r-devtools r-doparallel r-future r-ggridges r-glmnet r-globals r-htmltools r-htmlwidgets r-listenv r-lpsolveapi r-pbapply r-plotly r-reticulate r-rgl r-spdep r-tidyr umap-learn;
       conda remove -n ${TEST_ENV} r-ddrtree bioconductor-monocle;
       $HOME/miniconda/envs/${TEST_ENV}/bin/Rscript -e 'install.packages("pbmcapply", repos="https://cran.ma.imperial.ac.uk")';
       $HOME/miniconda/envs/${TEST_ENV}/bin/Rscript -e 'devtools::install_github("cole-trapnell-lab/DDRTree", ref="simple-ppt-like", upgrade="never")';

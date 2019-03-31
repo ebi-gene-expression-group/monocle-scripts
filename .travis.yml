@@ -1,12 +1,13 @@
 before_install:
   - if test -e $HOME/miniconda/bin; then
-        echo "miniconda already installed.";
+      echo "miniconda already installed.";
+      export PATH="$HOME/miniconda/bin:$PATH";
     else
       if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
         wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh;
       else
         wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
-      fi
+      fi;
 
       rm -rf $HOME/miniconda;
       bash miniconda.sh -b -p $HOME/miniconda;
@@ -24,36 +25,36 @@ before_install:
       conda config --set channel_priority strict;
 
       conda info -a;
-    fi;
+    fi
 
-    export MONOCLE_VERSION="4d37597bebd2e8f2ef89eaf11111fb0ab9e4063e";
+  - export MONOCLE_VERSION="4d37597bebd2e8f2ef89eaf11111fb0ab9e4063e";
     export TEST_ENV="monocle_2_99_3";
-    if test -e $HOME/miniconda/envs/${TEST_ENV}; then
-        echo "${TEST_ENV} already created.";
+
+    if test -e "$HOME/miniconda/envs/$TEST_ENV/lib/R/library/monocle"; then
+      echo "monocle already installed";
     else
-      conda create -n ${TEST_ENV} python=$TRAVIS_PYTHON_VERSION bioconductor-monocle=2.10.0 bioconductor-delayedmatrixstats bioconductor-iranges louvain r-devtools r-doparallel r-future r-ggridges r-glmnet r-globals r-htmltools r-htmlwidgets r-listenv r-lpsolveapi r-pbapply r-plotly r-reticulate r-rgl r-spdep r-tidyr umap-learn;
-      conda remove -n ${TEST_ENV} r-ddrtree bioconductor-monocle;
-      $HOME/miniconda/envs/${TEST_ENV}/bin/Rscript -e 'install.packages("pbmcapply", repos="https://cran.ma.imperial.ac.uk")';
-      $HOME/miniconda/envs/${TEST_ENV}/bin/Rscript -e 'devtools::install_github("cole-trapnell-lab/DDRTree", ref="simple-ppt-like", upgrade="never")';
-      $HOME/miniconda/envs/${TEST_ENV}/bin/Rscript -e 'devtools::install_github("cole-trapnell-lab/L1-graph", upgrade="never")';
-      $HOME/miniconda/envs/${TEST_ENV}/bin/Rscript -e 'devtools::install_github("cole-trapnell-lab/monocle-release", ref="'${MONOCLE_VERSION}'", upgrade="never")';
+      if test -e "$HOME/miniconda/envs/$TEST_ENV"; then
+        conda remove -n $TEST_ENV --all;
+      fi;
+
+      bash install_monocle3.sh $TEST_ENV $MONOCLE_VERSION $TRAVIS_PYTHON_VERSION;
     fi
 
 install:
-    - export PATH="$HOME/miniconda/bin:$PATH"
-    - source activate monocle_2_99_3
+  - export PATH="$HOME/miniconda/bin:$PATH"
+  - source activate "$TEST_ENV"
 
 before_script:
-    - export PATH=`pwd`:$PATH
+  - export PATH=`pwd`:$PATH
 
-script: $HOME/miniconda/envs/${TEST_ENV}/bin/Rscript -e 'suppressPackageStartupMessages(library(monocle)); stopifnot(packageVersion("monocle")=="2.99.3")' && ./monocle-scripts-post-install-tests.bats
+script: ./monocle-scripts-post-install-tests.bats
 
 cache:
   directories:
-      - $HOME/miniconda
-      - post_install_tests
+    - $HOME/miniconda
+    - post_install_tests
 
 before_cache:
-    - if ! [[ $TRAVIS_TAG ]]; then rm -rf $HOME/miniconda/conda-bld; fi
-    - rm -rf post_install_tests/outputs
-    - rm -rf $HOME/miniconda/locks $HOME/miniconda/pkgs $HOME/miniconda/var $HOME/miniconda/conda-meta/history
+  - if ! [[ $TRAVIS_TAG ]]; then rm -rf $HOME/miniconda/conda-bld; fi
+  - rm -rf post_install_tests/outputs
+  - rm -rf $HOME/miniconda/locks $HOME/miniconda/pkgs $HOME/miniconda/var $HOME/miniconda/conda-meta/history

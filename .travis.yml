@@ -34,7 +34,7 @@ before_install:
       echo "monocle already installed";
     else
       if test -e "$HOME/miniconda/envs/$TEST_ENV"; then
-        conda remove -n $TEST_ENV --all;
+        conda remove -y -q -n $TEST_ENV --all;
       fi;
 
       bash install_monocle3.sh $TEST_ENV $MONOCLE_VERSION $TRAVIS_PYTHON_VERSION;

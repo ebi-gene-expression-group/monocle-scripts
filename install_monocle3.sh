@@ -9,7 +9,13 @@ monocle_version="${monocle_version:-monocle3_alpha}"
 python_version="${3:-$TRAVIS_PYTHON_VERSION}"
 python_version="${python_version:-3.6}"
 
-conda create -n $env_name python=$python_version \
+conda config --add channels defaults
+conda config --add channels bioconda
+conda config --add channels conda-forge
+
+conda config --set always_yes yes --set changeps1 no --set channel_priority strict
+
+conda create -q -n $env_name python=$python_version \
     bioconductor-monocle=2.10.0 bioconductor-delayedmatrixstats bioconductor-iranges louvain umap-learn \
     r-class r-classint r-dbi r-devtools r-doparallel r-e1071 r-future r-ggridges r-glmnet r-globals \
     r-htmltools r-htmlwidgets r-listenv r-lpsolveapi r-pbapply r-plotly r-reticulate r-rgl r-spdep \

@@ -43,6 +43,7 @@ before_install:
 install:
   - export PATH="$HOME/miniconda/bin:$PATH"
   - source activate "$TEST_ENV"
+  - Rscript -e 'devtools::install(".")'
 
 before_script:
   - export PATH=`pwd`:$PATH

@@ -1,0 +1,14 @@
+Package: MonocleScripts
+Title: Command line scripts for Monocle3
+Version: 0.0.1
+Authors@R: person('Ni', 'Huang', email = 'nh3@users.noreply.github.com',
+                  role=c('aut', 'cre'))
+Description: This package provides a set of command line wrapper scripts for
+    Monocle3 functions to facilitate building flexible workflows using different
+    frameworks.
+Depends:
+    R (>= 3.5.1),
+    optparse,
+    monocle (>= 2.99.3)
+License: GPLv3
+LazyDate: true

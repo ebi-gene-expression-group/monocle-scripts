@@ -1,0 +1,19 @@
+#!/usr/bin/env Rscript
+
+suppressPackageStartupMessages(library(MonocleScripts))
+
+command_spec <- generate_command_spec()
+
+usage <- generate_command_usage(command_spec)
+
+cmd <- get_sub_command(command_spec, usage)
+
+cmd_spec <- command_spec[command_spec$name == cmd,]
+
+option_spec <- prepare_option_spec(cmd_spec)
+
+opts <- prepare_parsed_options(get_opts(option_spec, args), cmd_spec)
+
+method <- paste0('monocle_', cmd)
+
+do.call(method, opts)

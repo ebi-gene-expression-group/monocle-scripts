@@ -6,7 +6,9 @@ command_spec <- generate_command_spec()
 
 usage <- generate_command_usage(command_spec)
 
-cmd <- get_sub_command(command_spec, usage)
+args <- get_sub_command_args(command_spec, usage)
+
+cmd <- args[1]
 
 cmd_spec <- command_spec[command_spec$name == cmd,]
 

@@ -71,7 +71,7 @@ get_opts <- function(arguments, args) {
 }
 
 #' Pre-parse command line args to get sub-command
-get_sub_command <- function(command_spec, usage) {
+get_sub_command_args <- function(command_spec, usage) {
     args <- commandArgs(trailing=TRUE)
     if (length(args) == 0 || args[1] %in% c('-h', '--help')) {
         message(usage)
@@ -82,5 +82,5 @@ get_sub_command <- function(command_spec, usage) {
 
     if (!cmd %in% command_spec$name) stop(paste('Unrecognised command:', cmd), call. = FALSE)
 
-    cmd
+    args
 }

@@ -74,7 +74,7 @@ prepare_option_spec <- function(cmd_spec) {
     option_spec <- do.call('c', fn_options)
     if (grepl('p', cmd_spec$type)) option_spec <- c(output_plot_options(), option_spec)
     if (grepl('t', cmd_spec$type)) option_spec <- c(output_table_options(), option_spec)
-    if (grepl('o', cmd_spec$type)) option_spec <- c(output_obj_options(), option_spec)
+    if (grepl('o', cmd_spec$type)) option_spec <- c(output_object_options(), option_spec)
     if (grepl('i', cmd_spec$type)) option_spec <- c(input_options(), option_spec)
     option_spec <- c(option_spec, common_options())
 }

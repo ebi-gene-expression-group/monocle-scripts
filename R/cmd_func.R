@@ -55,16 +55,17 @@ monocle_write_plot <- function(p, output_plot, output_plot_format = 'png') {
 
 #' Get root principal nodes
 #'
-get_root_principal_nodes <- function(cds, cell_phenotype, root_type) {
+#' Turning the monocle3 tutorial (08.08.19) function into something more general,
+#' matching what was originally here
+get_root_principal_nodes <- function(cds, cell_phenotype, root_type, reduction_method) {
     cell_ids <- which(pData(cds)[, cell_phenotype] == root_type)
 
     # `pr_graph_cell_proj_closest_vertex` is a matrix with a single column that
     # stores for each cell, the ID of the principal graph node it's closest to
     closest_vertex <-
-        cds@auxOrderingData[[cds@rge_method]]$pr_graph_cell_proj_closest_vertex
+        cds@principal_graph_aux[[reduction_method]]$pr_graph_cell_proj_closest_vertex
     closest_vertex <- as.matrix(closest_vertex[colnames(cds), ])
-    root_pr_nodes <- V(cds@minSpanningTree)$name[as.numeric(
-                         names(which.max(table(closest_vertex[cell_ids,])))
-                     )]
+    root_pr_nodes <- igraph::V(principal_graph(cds)[[reduction_method]])$name[as.numeric(names
+      (which.max(table(closest_vertex[cell_ids,]))))]
     root_pr_nodes
 }

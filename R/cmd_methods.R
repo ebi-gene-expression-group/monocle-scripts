@@ -110,11 +110,12 @@ monocle_preprocess <- function(
 ) {
     cds <- monocle_read_obj(input_object, input_object_format)
 
-    cds <- estimateSizeFactors(cds)
-    cds <- estimateDispersions(cds)
+	#the current (08.08.19) monocle3 tutorial doesn't do this anymore, so commenting out
+    #cds <- estimateSizeFactors(cds)
+    #cds <- estimateDispersions(cds)
 
     cds <- do.call(
-        'preprocessCDS',
+        'preprocess_cds',
         c(list(cds, verbose=verbose), preprocessCDS_options)
     )
 
@@ -136,7 +137,7 @@ monocle_reduceDim <- function(
     cds <- monocle_read_obj(input_object, input_object_format)
 
     cds <- do.call(
-        'reduceDimension',
+        'reduce_dimension',
         c(list(cds, verbose=verbose), reduceDimension_options)
     )
 
@@ -158,7 +159,7 @@ monocle_partition <- function(
     cds <- monocle_read_obj(input_object, input_object_format)
 
     cds <- do.call(
-        'partitionCells',
+        'cluster_cells',
         c(list(cds, verbose=verbose), partitionCells_options)
     )
 
@@ -180,7 +181,7 @@ monocle_learnGraph <- function(
     cds <- monocle_read_obj(input_object, input_object_format)
 
     cds <- do.call(
-        'learnGraph',
+        'learn_graph',
         c(list(cds, verbose=verbose), learnGraph_options)
     )
 
@@ -233,7 +234,7 @@ monocle_diffExp <- function(
     cds <- monocle_read_obj(input_object, input_object_format)
 
     cds <- do.call(
-        'principalGraphTest',
+        'graph_test',
         c(list(cds, verbose=verbose), principalGraphTest_options)
     )
 
@@ -254,7 +255,7 @@ monocle_plotCells <- function(
     cds <- monocle_read_obj(input_object, input_object_format)
 
     p <- do.call(
-        'plot_cell_trajectory',
+        'plot_cells',
         c(list(cds, verbose=verbose), plot_cell_trajectory_options)
     )
 

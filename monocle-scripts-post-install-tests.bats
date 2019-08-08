@@ -7,19 +7,19 @@ setup() {
     output_dir="${test_dir}/outputs"
     input_url='http://trapnell-lab.gs.washington.edu/public_share/valid_subset_GSE72857_cds2.RDS'
     input_rds="${data_dir}/input.rds"
-    preprocess_opt="-f cds2 --method PCA --num-dim 50 --norm-method log --pseudo-expr 1"
+    preprocess_opt="-f cds2 --method PCA --num-dim 50 --norm-method log --pseudo-count 1"
     preprocess_rds="${output_dir}/preprocess.rds"
     reduceDim_opt="--max-components 2 --reduction-method UMAP"
     reduceDim_rds="${output_dir}/reduceDim.rds"
     partition_opt="--knn 20 --louvain-iter 1"
     partition_rds="${output_dir}/partition.rds"
-    learnGraph_opt="--max-components 2 --rge-method SimplePPT --partition-group louvain_component --euclidean-distance-ratio 1 --geodestic-distance-ratio 0.333 --minimal-branch-len 10"
+    learnGraph_opt=""
     learnGraph_rds="${output_dir}/learnGraph.rds"
-    orderCells_opt="--cell-phenotype cell_type2 --root-type MP/EP"
+    orderCells_opt="--cell-phenotype cell_type2 --root-type MP/EP --reduction-method UMAP"
     orderCells_rds="${output_dir}/orderCells.rds"
     diffExp_opt="-F tsv --knn 25 --method Moran_I --alternative greater --cores 2"
     diffExp_tbl="${output_dir}/diffExp.tsv"
-    plotCells_opt="-F png --xdim 2 --ydim 1 --color-by Pseudotime --backbone-color grey --cell-size 1 --alpha 0.2"
+    plotCells_opt="-F png --xdim 2 --ydim 1 --color-by pseudotime --reduction-method UMAP --cell-size 1 --alpha 0.2"
     plotCells_plt="${output_dir}/plotCells.png"
 
     if [ ! -e "$output_dir" ]; then

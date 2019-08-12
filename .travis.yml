@@ -27,10 +27,10 @@ before_install:
       conda info -a;
     fi
 
-  - export MONOCLE_VERSION="4d37597bebd2e8f2ef89eaf11111fb0ab9e4063e";
-    export TEST_ENV="monocle_2_99_3";
+  - export MONOCLE_VERSION="e2121737af07efcc12cea77c670e98d20383b268";
+    export TEST_ENV="monocle3b";
 
-    if test -e "$HOME/miniconda/envs/$TEST_ENV/lib/R/library/monocle"; then
+    if test -e "$HOME/miniconda/envs/$TEST_ENV/lib/R/library/monocle3"; then
       echo "monocle already installed";
     else
       if test -e "$HOME/miniconda/envs/$TEST_ENV"; then

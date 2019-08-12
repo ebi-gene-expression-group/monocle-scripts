@@ -1,6 +1,6 @@
 Package: MonocleScripts
 Title: Command line scripts for Monocle3
-Version: 0.0.1
+Version: 0.0.2
 Authors@R: person('Ni', 'Huang', email = 'nh3@users.noreply.github.com',
                   role=c('aut', 'cre'))
 Description: This package provides a set of command line wrapper scripts for
@@ -9,6 +9,6 @@ Description: This package provides a set of command line wrapper scripts for
 Depends:
     R (>= 3.5.1),
     optparse,
-    monocle (>= 2.99.3)
+    monocle3 (>= 0.1.2)
 License: GPLv3
 LazyDate: true

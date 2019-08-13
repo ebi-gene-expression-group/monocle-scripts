@@ -19,7 +19,7 @@ setup() {
     reduceDim_rds="${output_dir}/reduceDim.rds"
     partition_opt="--knn 20 --louvain-iter 1"
     partition_rds="${output_dir}/partition.rds"
-    learnGraph_opt=""
+    learnGraph_opt="--minimal-branch-len 15"
     learnGraph_rds="${output_dir}/learnGraph.rds"
     orderCells_opt="--cell-phenotype embryo.time.bin --root-type 130-170 --reduction-method UMAP"
     orderCells_rds="${output_dir}/orderCells.rds"

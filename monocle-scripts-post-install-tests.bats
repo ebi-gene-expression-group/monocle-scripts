@@ -13,7 +13,7 @@ setup() {
     var_rds="${data_dir}/var.rds"
     create_opt="--expression-matrix $exprs_rds --cell-metadata $obs_rds --gene-annotation $var_rds"
     create_rds="${output_dir}/create.rds"
-    preprocess_opt="-f cds2 --method PCA --num-dim 50 --norm-method log --pseudo-count 1"
+    preprocess_opt="-f cds3 --method PCA --num-dim 50 --norm-method log --pseudo-count 1"
     preprocess_rds="${output_dir}/preprocess.rds"
     reduceDim_opt="--max-components 2 --reduction-method UMAP"
     reduceDim_rds="${output_dir}/reduceDim.rds"

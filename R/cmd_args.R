@@ -112,8 +112,8 @@ common_options <- function() {
 
 function_options <- function(func_names) {
     func_options <- list(
-        #' Command line arguments for makeCDS
-        makeCDS = list(
+        #' Command line arguments for createCDS
+        createCDS = list(
             make_option(
                 c('--expression-matrix'),
                 action = 'store',

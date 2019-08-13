@@ -116,7 +116,7 @@ monocle_create <- function(
             assign(var, NULL)
         else
         {
-            if (upper(substr(file, nchar(file)-2, nchar(file))) == 'RDS')
+            if (toupper(substr(file, nchar(file)-2, nchar(file))) == 'RDS')
                 assign(var, readRDS(file))
             else
                 assign(var, read.csv(file, row.names=1, stringsAsFactors=FALSE))
@@ -139,7 +139,7 @@ monocle_create <- function(
 #' @name monocle_preprocess
 #'
 #' @importFrom BiocGeneric estimateSizeFactors estimateDispersions
-#' @importFrom monocle preprocessCDS
+#' @importFrom monocle3 preprocess_cds
 monocle_preprocess <- function(
     input_object,
     output_object,
@@ -165,7 +165,7 @@ monocle_preprocess <- function(
 
 #' @name monocle_reduceDim
 #'
-#' @importFrom monocle reduceDimension
+#' @importFrom monocle3 reduce_dimension
 monocle_reduceDim <- function(
     input_object,
     output_object,
@@ -187,7 +187,7 @@ monocle_reduceDim <- function(
 
 #' @name monocle_partition
 #'
-#' @importFrom monocle partitionCells
+#' @importFrom monocle3 cluster_cells
 monocle_partition <- function(
     input_object,
     output_object,
@@ -209,7 +209,7 @@ monocle_partition <- function(
 
 #' @name monocle_learnGraph
 #'
-#' @importFrom monocle learnGraph
+#' @importFrom monocle3 learn_graph
 monocle_learnGraph <- function(
     input_object,
     output_object,
@@ -231,7 +231,7 @@ monocle_learnGraph <- function(
 
 #' @name monocle_orderCells
 #'
-#' @importFrom monocle orderCells
+#' @importFrom monocle3 order_cells
 monocle_orderCells <- function(
     input_object,
     output_object,
@@ -253,7 +253,7 @@ monocle_orderCells <- function(
     }
 
     cds <- do.call(
-        'orderCells',
+        'order_cells',
         c(list(cds, verbose=verbose), orderCells_options)
     )
 
@@ -262,7 +262,7 @@ monocle_orderCells <- function(
 
 #' @name monocle_diffExp
 #'
-#' @importFrom monocle principalGraphTest
+#' @importFrom monocle3 graph_test
 monocle_diffExp <- function(
     input_object,
     output_table,
@@ -284,7 +284,7 @@ monocle_diffExp <- function(
 
 #' @name monocle_plotCells
 #'
-#' @importFrom monocle plot_cell_trajectory
+#' @importFrom monocle3 plot_cells
 monocle_plotCells <- function(
     input_object,
     output_plot,

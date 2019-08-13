@@ -114,10 +114,12 @@ function_options <- function(func_names) {
     func_options <- list(
         #' Command line arguments for makeCDS
         makeCDS = list(
-            expression_matrix = list(
-                name = '<expression_matrix>',
-                type = as.character,
-                help = 'The expression matrix, genes as rows, cells as columns. Provide as CSV or RDS.'
+            make_option(
+                c('--expression-matrix'),
+                action = 'store',
+                type = 'character',
+                metavar = 'STR',
+                help = 'Expression matrix, genes as rows, cells as columns. Required input. Provide as CSV or RDS.'
             ),
             make_option(
                 c('--cell-metadata'),

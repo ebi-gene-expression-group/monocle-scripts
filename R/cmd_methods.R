@@ -123,8 +123,11 @@ monocle_create <- function(
         }
     }
     
-    if (is.null())
-        
+    if (is.null(expression_matrix))
+    {
+        message('You need to provide the expression matrix on input of monocle create. Aborting.')
+        q()
+    }
     
     cds = new_cell_data_set(expression_matrix,
                             cell_metadata = cell_metadata,

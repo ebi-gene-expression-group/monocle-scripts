@@ -5,6 +5,7 @@
 generate_command_spec <- function() {
     command_spec <- data.frame(
         name = c(
+            'create',
             'preprocess',
             'reduceDim',
             'partition',
@@ -14,6 +15,7 @@ generate_command_spec <- function() {
             'plotCells'
         ),
         description = c(
+            'Creation of Monocle 3 object from expression and metadata.',
             'Normalisation, scaling, initial dimension reduction.',
             'Reduce dimensionality by UMAP.',
             'Partition cells into groups.',
@@ -23,6 +25,7 @@ generate_command_spec <- function() {
             'Visualise trajectories.'
         ),
         functions = c(
+            'createCDS',
             'preprocessCDS',
             'reduceDimension',
             'partitionCells',
@@ -31,7 +34,7 @@ generate_command_spec <- function() {
             'principalGraphTest',
             'plot_cell_trajectory'
         ),
-        type = c('io', 'io', 'io', 'io', 'io', 'it', 'ip'),
+        type = c('o','io', 'io', 'io', 'io', 'io', 'it', 'ip'),
         stringsAsFactors = FALSE
     )
     rownames(command_spec) <- command_spec$name
@@ -93,6 +96,41 @@ prepare_parsed_options <- function(opts, cmd_spec) {
     }
     opts$help <- NULL
     c(opts, new_opts)
+}
+
+#' @name monocle_create
+#'
+monocle_create <- function(
+    output_object,
+    output_object_format = 'cds3',
+    introspective = FALSE,
+    verbose = FALSE,
+    createCDS_options = list()
+) {
+    #the three constituents of the new_cell_data_set() call
+    #are passed as arguments to the function, and live in this list
+    for (var in names(createCDS_options))
+    {
+        file = createCDS_options[[var]]
+        if (is.null(file))
+            assign(var, NULL)
+        else
+        {
+            if (upper(substr(file, nchar(file)-2, nchar(file))) == 'RDS')
+                assign(var, readRDS(file))
+            else
+                assign(var, read.csv(file, row.names=1, stringsAsFactors=FALSE))
+        }
+    }
+    
+    if (is.null())
+        
+    
+    cds = new_cell_data_set(expression_matrix,
+                            cell_metadata = cell_metadata,
+                            gene_metadata = gene_annotation)
+    
+    monocle_write_obj(cds, output_object, output_object_format, introspective)
 }
 
 #' @name monocle_preprocess

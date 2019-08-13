@@ -112,6 +112,31 @@ common_options <- function() {
 
 function_options <- function(func_names) {
     func_options <- list(
+        #' Command line arguments for makeCDS
+        makeCDS = list(
+            expression_matrix = list(
+                name = '<expression_matrix>',
+                type = 'as.character',
+                help = 'The expression matrix, genes as rows, cells as columns. Provide as CSV or RDS.'
+            ),
+            make_option(
+                c('--cell-metadata'),
+                action = 'store',
+                type = 'character',
+                default = NULL,
+                metavar = 'STR',
+                help = 'Per-cell annotation, optional. Row names must match the column names of the expression matrix. Provide as CSV or RDS.'
+            ),
+            make_option(
+                c('--gene-annotation'),
+                action = 'store',
+                type = 'character',
+                default = NULL,
+                metavar = 'STR',
+                help = 'Per-gene annotation, optional. Row names must match the row names of the expression matrix. Provide as CSV or RDS.'
+            )
+        ),
+        
         #' Command line arguments for preprocessCDS
         preprocessCDS = list(
             make_option(

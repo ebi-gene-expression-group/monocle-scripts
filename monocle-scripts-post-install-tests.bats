@@ -25,7 +25,7 @@ setup() {
     orderCells_rds="${output_dir}/orderCells.rds"
     diffExp_opt="-F tsv --knn 25 --method Moran_I --alternative greater --cores 2"
     diffExp_tbl="${output_dir}/diffExp.tsv"
-    plotCells_opt="-F png --xdim 2 --ydim 1 --color-by pseudotime --reduction-method UMAP --cell-size 1 --alpha 0.2"
+    plotCells_opt="-F png --xdim 2 --ydim 1 --color-cells-by pseudotime --reduction-method UMAP --cell-size 1 --alpha 0.2"
     plotCells_plt="${output_dir}/plotCells.png"
 
     if [ ! -e "$output_dir" ]; then

@@ -1,36 +1,19 @@
 #' Read data
 #' 
-#' @importFrom monocle importCDS updateCDS
 monocle_read_obj <- function(input_object, input_object_format = 'cds3') {
-    rds <- readRDS(input_object)
-    if (input_object_format %in% c('sce', 'seurat')) {
-        cds <- importCDS(rds)
-    } else if (input_object_format == 'cds2') {
-        cds <- updateCDS(rds)
-    } else {
-        cds <- rds
-    }
+    cds <- readRDS(input_object)
 
     cds
 }
 
 #' Write data
 #' 
-#' @importFrom monocle exportCDS
 monocle_write_obj <- function(
     cds, output_object, output_object_format = 'cds3', introspective = FALSE
 ) {
     if (introspective) print(cds)
     
-    if (output_object_format == 'sce') {
-        rds <- exportCDS(cds, export_to = 'Scater', export_all = TRUE)
-    } else if (output_object_format == 'seurat') {
-        rds <- exportCDS(cds, export_to = 'Seurat', export_all = TRUE)
-    } else {
-        rds <- cds
-    }
-    
-    saveRDS(rds, file = output_object)
+    saveRDS(cds, file = output_object)
 }
 
 #' Write table

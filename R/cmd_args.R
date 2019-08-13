@@ -6,7 +6,8 @@ input_options <- function() {
             type = as.character,
             help = paste(
                 'Input object, can be SingleCellExperiment(sce), Seurat',
-                'object(seurat), CellDataSet V2(cds2) or V3(cds3).'
+                'object(seurat), CellDataSet V2(cds2) or V3(cds3).',
+                'Only cds3 is supported currently.'
             )
         ),
         make_option(
@@ -15,8 +16,8 @@ input_options <- function() {
             type = 'character',
             default = 'cds3',
             metavar = 'STR',
-            callback = check_choose_from(choices = c('sce', 'seurat', 'cds2', 'cds3')),
-            help = 'Format of input object, choose from {sce, seurat, cds2, cds3}. [Default: %default]'
+            callback = check_choose_from(choices = c('cds3')),
+            help = 'Format of input object. [Default: %default]'
         )
     )
 }
@@ -29,7 +30,8 @@ output_object_options <- function() {
             type = as.character,
             help = paste(
                 'Output object, can be SingleCellExperiment(sce), Seurat',
-                'object(seurat), or CellDataSet V3(cds3).'
+                'object(seurat), or CellDataSet V3(cds3).',
+                'Only cds3 is supported currently.'
             )
         ),
         make_option(
@@ -38,8 +40,8 @@ output_object_options <- function() {
             type = 'character',
             default = 'cds3',
             metavar = 'STR',
-            callback = check_choose_from(choices = c('sce', 'seurat', 'cds3')),
-            help = 'Format of output object, choose from {sce, seurat, cds3}. [Default: %default]'
+            callback = check_choose_from(choices = c('cds3')),
+            help = 'Format of output object. [Default: %default]'
         ),
         make_option(
             c('-I', '--introspective'),

@@ -116,7 +116,7 @@ function_options <- function(func_names) {
         makeCDS = list(
             expression_matrix = list(
                 name = '<expression_matrix>',
-                type = 'as.character',
+                type = as.character,
                 help = 'The expression matrix, genes as rows, cells as columns. Provide as CSV or RDS.'
             ),
             make_option(

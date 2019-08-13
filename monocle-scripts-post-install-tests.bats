@@ -15,7 +15,7 @@ setup() {
     create_rds="${output_dir}/create.rds"
     preprocess_opt="-f cds3 --method PCA --num-dim 50 --norm-method log --pseudo-count 1"
     preprocess_rds="${output_dir}/preprocess.rds"
-    reduceDim_opt="--max-components 2 --reduction-method UMAP"
+    reduceDim_opt="--max-components 2 --reduction-method UMAP --preprocess-method PCA"
     reduceDim_rds="${output_dir}/reduceDim.rds"
     partition_opt="--knn 20 --louvain-iter 1"
     partition_rds="${output_dir}/partition.rds"

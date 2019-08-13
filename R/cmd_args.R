@@ -243,7 +243,7 @@ function_options <- function(func_names) {
                 c('--preprocess-method'),
                 action = 'callback',
                 type = 'character',
-                default = 'LSI',
+                default = 'PCA',
                 metavar = 'STR',
                 callback = check_choose_from(choices = c('PCA', 'LSI')),
                 help = paste(

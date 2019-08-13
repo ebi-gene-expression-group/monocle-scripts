@@ -71,7 +71,7 @@ prepare_option_spec <- function(cmd_spec) {
         fn_name <- cmd_functions[i]
         for (j in seq_along(fn_options[[i]])) {
             dest <- fn_options[[i]][[j]]@dest
-            fn_options[[i]][[j]]@dest <- paste(fn_name, dest, sep='___')
+            fn_options[[i]][[j]]@dest <- paste(fn_name, dest, sep = '___')
         }
     }
     option_spec <- do.call('c', fn_options)
@@ -111,7 +111,7 @@ monocle_create <- function(
     if (is.null(createCDS_options[['expression_matrix']]))
     {
         message('You need to provide the expression matrix by --expression-matrix. Aborting.')
-        q(save='no', status=1)
+        q(save = 'no', status = 1)
     }
     #the three constituents of the new_cell_data_set() call
     #are passed as arguments to the function, and live in this list
@@ -124,8 +124,10 @@ monocle_create <- function(
         {
             if (toupper(substr(file, nchar(file)-2, nchar(file))) == 'RDS')
                 assign(var, readRDS(file))
+            else if (toupper(substr(file, nchar(file)-2, nchar(file))) == 'TSV')
+                assign(var, read.delim(file, row.names = 1, stringsAsFactors = FALSE))
             else
-                assign(var, read.csv(file, row.names=1, stringsAsFactors=FALSE))
+                assign(var, read.csv(file, row.names = 1, stringsAsFactors = FALSE))
         }
     }
 
@@ -179,7 +181,7 @@ monocle_reduceDim <- function(
 
     cds <- do.call(
         'reduce_dimension',
-        c(list(cds, verbose=verbose), reduceDimension_options)
+        c(list(cds, verbose = verbose), reduceDimension_options)
     )
 
     monocle_write_obj(cds, output_object, output_object_format, introspective)
@@ -201,7 +203,7 @@ monocle_partition <- function(
 
     cds <- do.call(
         'cluster_cells',
-        c(list(cds, verbose=verbose), partitionCells_options)
+        c(list(cds, verbose = verbose), partitionCells_options)
     )
 
     monocle_write_obj(cds, output_object, output_object_format, introspective)
@@ -217,7 +219,7 @@ monocle_learnGraph <- function(
     output_object_format = 'cds3',
     introspective = FALSE,
     verbose = FALSE,
-    learnGraph_options=list()
+    learnGraph_options = list()
 ) {
     cds <- monocle_read_obj(input_object, input_object_format)
 
@@ -235,7 +237,7 @@ monocle_learnGraph <- function(
 
     cds <- do.call(
         'learn_graph',
-        c(list(cds, verbose=verbose, learn_graph_control=learn_graph_control),
+        c(list(cds, verbose = verbose, learn_graph_control = learn_graph_control),
           learnGraph_options)
     )
 
@@ -252,8 +254,8 @@ monocle_orderCells <- function(
     output_object_format = 'cds3',
     introspective = FALSE,
     verbose = FALSE,
-    get_root_principal_nodes_options=list(),
-    orderCells_options=list()
+    get_root_principal_nodes_options = list(),
+    orderCells_options = list()
 ) {
     cds <- monocle_read_obj(input_object, input_object_format)
 
@@ -267,7 +269,7 @@ monocle_orderCells <- function(
 
     cds <- do.call(
         'order_cells',
-        c(list(cds, verbose=verbose), orderCells_options)
+        c(list(cds, verbose = verbose), orderCells_options)
     )
 
     monocle_write_obj(cds, output_object, output_object_format, introspective)
@@ -283,13 +285,13 @@ monocle_diffExp <- function(
     output_table_format = 'tsv',
     introspective = FALSE,
     verbose = FALSE,
-    principalGraphTest_options=list()
+    principalGraphTest_options = list()
 ) {
     cds <- monocle_read_obj(input_object, input_object_format)
 
     cds <- do.call(
         'graph_test',
-        c(list(cds, verbose=verbose), principalGraphTest_options)
+        c(list(cds, verbose = verbose), principalGraphTest_options)
     )
 
     monocle_write_table(cds, output_table, output_table_format, introspective)
@@ -304,7 +306,7 @@ monocle_plotCells <- function(
     input_object_format = 'cds3',
     output_plot_format = 'png',
     verbose = FALSE,
-    plot_cell_trajectory_options=list()
+    plot_cell_trajectory_options = list()
 ) {
     cds <- monocle_read_obj(input_object, input_object_format)
 

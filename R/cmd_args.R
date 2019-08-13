@@ -121,7 +121,7 @@ function_options <- function(func_names) {
                 action = 'store',
                 type = 'character',
                 metavar = 'STR',
-                help = 'Expression matrix, genes as rows, cells as columns. Required input. Provide as CSV or RDS.'
+                help = 'Expression matrix, genes as rows, cells as columns. Required input. Provide as TSV, CSV or RDS.'
             ),
             make_option(
                 c('--cell-metadata'),
@@ -129,7 +129,7 @@ function_options <- function(func_names) {
                 type = 'character',
                 default = NULL,
                 metavar = 'STR',
-                help = 'Per-cell annotation, optional. Row names must match the column names of the expression matrix. Provide as CSV or RDS.'
+                help = 'Per-cell annotation, optional. Row names must match the column names of the expression matrix. Provide as TSV, CSV or RDS.'
             ),
             make_option(
                 c('--gene-annotation'),
@@ -137,7 +137,7 @@ function_options <- function(func_names) {
                 type = 'character',
                 default = NULL,
                 metavar = 'STR',
-                help = 'Per-gene annotation, optional. Row names must match the row names of the expression matrix. Provide as CSV or RDS.'
+                help = 'Per-gene annotation, optional. Row names must match the row names of the expression matrix. Provide as TSV, CSV or RDS.'
             )
         ),
         

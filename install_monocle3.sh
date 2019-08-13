@@ -25,7 +25,7 @@ conda $cmd -q -n $env_name python=$python_version louvain umap-learn \
     r-assertthat r-matrix r-matrix.utils r-ggplot2 r-ggrepel r-viridis r-dplyr r-tidyr r-stringr r-reshape2 \
     r-plotly r-pryr r-base64enc r-hexbin r-crosstalk r-data.table r-codetools \
     r-devtools r-grr r-htmlwidgets r-pbapply r-pbmcapply r-irlba r-igraph r-rhpcblasctl r-rtsne r-lmtest \
-    r-pheatmap r-proxy r-pscl r-purrr r-rann r-reticulate r-shiny r-slam r-spdep r-speedglm r-uwot \
+    r-pheatmap r-proxy r-pscl r-purrr r-rann r-reticulate r-shiny r-slam r-spdep r-speedglm r-uwot r-vgam \
     bioconductor-limma bioconductor-singlecellexperiment bioconductor-delayedarray bioconductor-delayedmatrixstats
 
 source activate $env_name

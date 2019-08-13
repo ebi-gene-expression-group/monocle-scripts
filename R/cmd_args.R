@@ -352,71 +352,70 @@ function_options <- function(func_names) {
                     'closing after computing the principal graphs to identify',
                     'potential loop structure in the data space.'
                 )
+            ),
+            make_option(
+                c('--euclidean-distance-ratio'),
+                action = 'store',
+                type = 'numeric',
+                default = 1,
+                metavar = 'FLOAT',
+                help = paste(
+                    'The maximal ratio between the euclidean distance of two tip',
+                    'nodes in the spanning tree inferred from SimplePPT algorithm',
+                    'and that of the maximum distance between any connecting',
+                    'points on the spanning tree allowed to be connected during',
+                    'the loop closure procedure. [Default: %default]'
+                )
+            ),
+            make_option(
+                c('--geodesic-distance-ratio'),
+                action = 'store',
+                type = 'numeric',
+                default = 1/3,
+                metavar = 'FLOAT',
+                help = paste(
+                    'The minimal ratio between the geodestic distance of two',
+                    'tip nodes in the spanning tree inferred from SimplePPT',
+                    'algorithm and that of the length of the diameter path on',
+                    'the spanning tree allowed to be connected during the loop',
+                    'closure procedure. (Both euclidean_distance_ratio and',
+                    'geodestic_distance_ratio need to be satisfied to introduce',
+                    'the edge for loop closure.)'
+                )
+            ),
+            make_option(
+                c('--no-prune-graph'),
+                action = 'store_false',
+                type = 'logical',
+                dest = 'prune-graph',
+                default = TRUE,
+                help = paste(
+                    'When this option is set, perform an additional run of',
+                    'graph pruning to remove smaller insignificant branches.'
+                )
+            ),
+            make_option(
+                c('--minimal-branch-len'),
+                action = 'store',
+                type = 'integer',
+                default = 10,
+                metavar = 'INT',
+                help = paste(
+                    'The minimal length of the diameter path for a branch to be',
+                    'preserved during graph pruning procedure.',
+                    '[Default: %default]'
+                )
+            ),
+            make_option(
+                c('--orthogonal-proj-tip'),
+                action = 'store_true',
+                type = 'logical',
+                default = FALSE,
+                help = paste(
+                    'When this option is set, perform orthogonal projection for',
+                    'cells corresponding to the tip principal points.'
+                )
             )
-#all this now lives in some weird sub-option, leaving here just in case
-#            make_option(
-#                c('--euclidean-distance-ratio'),
-#                action = 'store',
-#                type = 'numeric',
-#                default = 1,
-#                metavar = 'FLOAT',
-#                help = paste(
-#                    'The maximal ratio between the euclidean distance of two tip',
-#                    'nodes in the spanning tree inferred from SimplePPT algorithm',
-#                    'and that of the maximum distance between any connecting',
-#                    'points on the spanning tree allowed to be connected during',
-#                    'the loop closure procedure. [Default: %default]'
-#                )
-#            ),
-#            make_option(
-#                c('--geodestic-distance-ratio'),
-#                action = 'store',
-#                type = 'numeric',
-#                default = 1/3,
-#                metavar = 'FLOAT',
-#                help = paste(
-#                    'The minimal ratio between the geodestic distance of two',
-#                    'tip nodes in the spanning tree inferred from SimplePPT',
-#                    'algorithm and that of the length of the diameter path on',
-#                    'the spanning tree allowed to be connected during the loop',
-#                    'closure procedure. (Both euclidean_distance_ratio and',
-#                    'geodestic_distance_ratio need to be satisfied to introduce',
-#                    'the edge for loop closure.)'
-#                )
-#            ),
-#            make_option(
-#                c('--no-prune-graph'),
-#                action = 'store_false',
-#                type = 'logical',
-#                dest = 'prune-graph',
-#                default = TRUE,
-#                help = paste(
-#                    'When this option is set, perform an additional run of',
-#                    'graph pruning to remove smaller insignificant branches.'
-#                )
-#            ),
-#            make_option(
-#                c('--minimal-branch-len'),
-#                action = 'store',
-#                type = 'integer',
-#                default = 10,
-#                metavar = 'INT',
-#                help = paste(
-#                    'The minimal length of the diameter path for a branch to be',
-#                    'preserved during graph pruning procedure.',
-#                    '[Default: %default]'
-#                )
-#            ),
-#            make_option(
-#                c('--orthogonal-proj-tip'),
-#                action = 'store_true',
-#                type = 'logical',
-#                default = FALSE,
-#                help = paste(
-#                    'When this option is set, perform orthogonal projection for',
-#                    'cells corresponding to the tip principal points.'
-#                )
-#            )
         ),
 
         #' Command line arguments for get_root_principal_nodes

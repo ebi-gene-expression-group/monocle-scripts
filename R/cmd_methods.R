@@ -221,9 +221,22 @@ monocle_learnGraph <- function(
 ) {
     cds <- monocle_read_obj(input_object, input_object_format)
 
+    learn_graph_control <- list()
+    for (opt in c(
+            'euclidean_distance_ratio',
+            'geodesic_distance_ratio',
+            'minimal_branch_len',
+            'orthogonal_proj_tip',
+            'prune_graph')
+    ) {
+        learn_graph_control[[opt]] <- learnGraph_options[[opt]]
+        learnGraph_options[[opt]] <- NULL
+    }
+
     cds <- do.call(
         'learn_graph',
-        c(list(cds, verbose=verbose), learnGraph_options)
+        c(list(cds, verbose=verbose, learn_graph_control=learn_graph_control),
+          learnGraph_options)
     )
 
     monocle_write_obj(cds, output_object, output_object_format, introspective)

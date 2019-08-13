@@ -297,7 +297,7 @@ monocle_plotCells <- function(
 
     p <- do.call(
         'plot_cells',
-        c(list(cds, verbose=verbose), plot_cell_trajectory_options)
+        c(list(cds), plot_cell_trajectory_options)
     )
 
     monocle_write_plot(p, output_plot, output_plot_format)

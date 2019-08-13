@@ -107,9 +107,15 @@ monocle_create <- function(
     verbose = FALSE,
     createCDS_options = list()
 ) {
+
+    if (is.null(createCDS_options[['expression_matrix']]))
+    {
+        message('You need to provide the expression matrix by --expression-matrix. Aborting.')
+        q(save='no', status=1)
+    }
     #the three constituents of the new_cell_data_set() call
     #are passed as arguments to the function, and live in this list
-    for (var in names(createCDS_options))
+    for (var in c('expression_matrix', 'cell_metadata', 'gene_annotation'))
     {
         file = createCDS_options[[var]]
         if (is.null(file))
@@ -122,13 +128,7 @@ monocle_create <- function(
                 assign(var, read.csv(file, row.names=1, stringsAsFactors=FALSE))
         }
     }
-    
-    if (is.null(expression_matrix))
-    {
-        message('You need to provide the expression matrix on input of monocle create. Aborting.')
-        q()
-    }
-    
+
     cds = new_cell_data_set(expression_matrix,
                             cell_metadata = cell_metadata,
                             gene_metadata = gene_annotation)

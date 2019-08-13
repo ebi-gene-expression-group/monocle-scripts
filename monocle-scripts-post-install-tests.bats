@@ -21,7 +21,7 @@ setup() {
     partition_rds="${output_dir}/partition.rds"
     learnGraph_opt=""
     learnGraph_rds="${output_dir}/learnGraph.rds"
-    orderCells_opt="--cell-phenotype cell_type2 --root-type MP/EP --reduction-method UMAP"
+    orderCells_opt="--cell-phenotype embryo.time.bin --root-type 130-170 --reduction-method UMAP"
     orderCells_rds="${output_dir}/orderCells.rds"
     diffExp_opt="-F tsv --knn 25 --method Moran_I --alternative greater --cores 2"
     diffExp_tbl="${output_dir}/diffExp.tsv"

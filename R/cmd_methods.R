@@ -5,6 +5,7 @@
 generate_command_spec <- function() {
     command_spec <- data.frame(
         name = c(
+            'create',
             'preprocess',
             'reduceDim',
             'partition',
@@ -14,6 +15,7 @@ generate_command_spec <- function() {
             'plotCells'
         ),
         description = c(
+            'Creation of Monocle 3 object from expression and metadata.',
             'Normalisation, scaling, initial dimension reduction.',
             'Reduce dimensionality by UMAP.',
             'Partition cells into groups.',
@@ -23,6 +25,7 @@ generate_command_spec <- function() {
             'Visualise trajectories.'
         ),
         functions = c(
+            'createCDS',
             'preprocessCDS',
             'reduceDimension',
             'partitionCells',
@@ -31,7 +34,7 @@ generate_command_spec <- function() {
             'principalGraphTest',
             'plot_cell_trajectory'
         ),
-        type = c('io', 'io', 'io', 'io', 'io', 'it', 'ip'),
+        type = c('o','io', 'io', 'io', 'io', 'io', 'it', 'ip'),
         stringsAsFactors = FALSE
     )
     rownames(command_spec) <- command_spec$name
@@ -68,7 +71,7 @@ prepare_option_spec <- function(cmd_spec) {
         fn_name <- cmd_functions[i]
         for (j in seq_along(fn_options[[i]])) {
             dest <- fn_options[[i]][[j]]@dest
-            fn_options[[i]][[j]]@dest <- paste(fn_name, dest, sep='___')
+            fn_options[[i]][[j]]@dest <- paste(fn_name, dest, sep = '___')
         }
     }
     option_spec <- do.call('c', fn_options)
@@ -95,10 +98,50 @@ prepare_parsed_options <- function(opts, cmd_spec) {
     c(opts, new_opts)
 }
 
+#' @name monocle_create
+#'
+monocle_create <- function(
+    output_object,
+    output_object_format = 'cds3',
+    introspective = FALSE,
+    verbose = FALSE,
+    createCDS_options = list()
+) {
+
+    if (is.null(createCDS_options[['expression_matrix']]))
+    {
+        message('You need to provide the expression matrix by --expression-matrix. Aborting.')
+        q(save = 'no', status = 1)
+    }
+    #the three constituents of the new_cell_data_set() call
+    #are passed as arguments to the function, and live in this list
+    for (var in c('expression_matrix', 'cell_metadata', 'gene_annotation'))
+    {
+        file = createCDS_options[[var]]
+        if (is.null(file))
+            assign(var, NULL)
+        else
+        {
+            if (toupper(substr(file, nchar(file)-2, nchar(file))) == 'RDS')
+                assign(var, readRDS(file))
+            else if (toupper(substr(file, nchar(file)-2, nchar(file))) == 'TSV')
+                assign(var, read.delim(file, row.names = 1, stringsAsFactors = FALSE))
+            else
+                assign(var, read.csv(file, row.names = 1, stringsAsFactors = FALSE))
+        }
+    }
+
+    cds = new_cell_data_set(expression_matrix,
+                            cell_metadata = cell_metadata,
+                            gene_metadata = gene_annotation)
+    
+    monocle_write_obj(cds, output_object, output_object_format, introspective)
+}
+
 #' @name monocle_preprocess
 #'
 #' @importFrom BiocGeneric estimateSizeFactors estimateDispersions
-#' @importFrom monocle preprocessCDS
+#' @importFrom monocle3 preprocess_cds
 monocle_preprocess <- function(
     input_object,
     output_object,
@@ -110,11 +153,12 @@ monocle_preprocess <- function(
 ) {
     cds <- monocle_read_obj(input_object, input_object_format)
 
-    cds <- estimateSizeFactors(cds)
-    cds <- estimateDispersions(cds)
+	#the current (08.08.19) monocle3 tutorial doesn't do this anymore, so commenting out
+    #cds <- estimateSizeFactors(cds)
+    #cds <- estimateDispersions(cds)
 
     cds <- do.call(
-        'preprocessCDS',
+        'preprocess_cds',
         c(list(cds, verbose=verbose), preprocessCDS_options)
     )
 
@@ -123,7 +167,7 @@ monocle_preprocess <- function(
 
 #' @name monocle_reduceDim
 #'
-#' @importFrom monocle reduceDimension
+#' @importFrom monocle3 reduce_dimension
 monocle_reduceDim <- function(
     input_object,
     output_object,
@@ -136,8 +180,8 @@ monocle_reduceDim <- function(
     cds <- monocle_read_obj(input_object, input_object_format)
 
     cds <- do.call(
-        'reduceDimension',
-        c(list(cds, verbose=verbose), reduceDimension_options)
+        'reduce_dimension',
+        c(list(cds, verbose = verbose), reduceDimension_options)
     )
 
     monocle_write_obj(cds, output_object, output_object_format, introspective)
@@ -145,7 +189,7 @@ monocle_reduceDim <- function(
 
 #' @name monocle_partition
 #'
-#' @importFrom monocle partitionCells
+#' @importFrom monocle3 cluster_cells
 monocle_partition <- function(
     input_object,
     output_object,
@@ -158,8 +202,8 @@ monocle_partition <- function(
     cds <- monocle_read_obj(input_object, input_object_format)
 
     cds <- do.call(
-        'partitionCells',
-        c(list(cds, verbose=verbose), partitionCells_options)
+        'cluster_cells',
+        c(list(cds, verbose = verbose), partitionCells_options)
     )
 
     monocle_write_obj(cds, output_object, output_object_format, introspective)
@@ -167,7 +211,7 @@ monocle_partition <- function(
 
 #' @name monocle_learnGraph
 #'
-#' @importFrom monocle learnGraph
+#' @importFrom monocle3 learn_graph
 monocle_learnGraph <- function(
     input_object,
     output_object,
@@ -175,13 +219,26 @@ monocle_learnGraph <- function(
     output_object_format = 'cds3',
     introspective = FALSE,
     verbose = FALSE,
-    learnGraph_options=list()
+    learnGraph_options = list()
 ) {
     cds <- monocle_read_obj(input_object, input_object_format)
 
+    learn_graph_control <- list()
+    for (opt in c(
+            'euclidean_distance_ratio',
+            'geodesic_distance_ratio',
+            'minimal_branch_len',
+            'orthogonal_proj_tip',
+            'prune_graph')
+    ) {
+        learn_graph_control[[opt]] <- learnGraph_options[[opt]]
+        learnGraph_options[[opt]] <- NULL
+    }
+
     cds <- do.call(
-        'learnGraph',
-        c(list(cds, verbose=verbose), learnGraph_options)
+        'learn_graph',
+        c(list(cds, verbose = verbose, learn_graph_control = learn_graph_control),
+          learnGraph_options)
     )
 
     monocle_write_obj(cds, output_object, output_object_format, introspective)
@@ -189,7 +246,7 @@ monocle_learnGraph <- function(
 
 #' @name monocle_orderCells
 #'
-#' @importFrom monocle orderCells
+#' @importFrom monocle3 order_cells
 monocle_orderCells <- function(
     input_object,
     output_object,
@@ -197,8 +254,8 @@ monocle_orderCells <- function(
     output_object_format = 'cds3',
     introspective = FALSE,
     verbose = FALSE,
-    get_root_principal_nodes_options=list(),
-    orderCells_options=list()
+    get_root_principal_nodes_options = list(),
+    orderCells_options = list()
 ) {
     cds <- monocle_read_obj(input_object, input_object_format)
 
@@ -211,8 +268,8 @@ monocle_orderCells <- function(
     }
 
     cds <- do.call(
-        'orderCells',
-        c(list(cds, verbose=verbose), orderCells_options)
+        'order_cells',
+        c(list(cds, verbose = verbose), orderCells_options)
     )
 
     monocle_write_obj(cds, output_object, output_object_format, introspective)
@@ -220,7 +277,7 @@ monocle_orderCells <- function(
 
 #' @name monocle_diffExp
 #'
-#' @importFrom monocle principalGraphTest
+#' @importFrom monocle3 graph_test
 monocle_diffExp <- function(
     input_object,
     output_table,
@@ -228,13 +285,13 @@ monocle_diffExp <- function(
     output_table_format = 'tsv',
     introspective = FALSE,
     verbose = FALSE,
-    principalGraphTest_options=list()
+    principalGraphTest_options = list()
 ) {
     cds <- monocle_read_obj(input_object, input_object_format)
 
     cds <- do.call(
-        'principalGraphTest',
-        c(list(cds, verbose=verbose), principalGraphTest_options)
+        'graph_test',
+        c(list(cds, verbose = verbose), principalGraphTest_options)
     )
 
     monocle_write_table(cds, output_table, output_table_format, introspective)
@@ -242,20 +299,20 @@ monocle_diffExp <- function(
 
 #' @name monocle_plotCells
 #'
-#' @importFrom monocle plot_cell_trajectory
+#' @importFrom monocle3 plot_cells
 monocle_plotCells <- function(
     input_object,
     output_plot,
     input_object_format = 'cds3',
     output_plot_format = 'png',
     verbose = FALSE,
-    plot_cell_trajectory_options=list()
+    plot_cell_trajectory_options = list()
 ) {
     cds <- monocle_read_obj(input_object, input_object_format)
 
     p <- do.call(
-        'plot_cell_trajectory',
-        c(list(cds, verbose=verbose), plot_cell_trajectory_options)
+        'plot_cells',
+        c(list(cds), plot_cell_trajectory_options)
     )
 
     monocle_write_plot(p, output_plot, output_plot_format)

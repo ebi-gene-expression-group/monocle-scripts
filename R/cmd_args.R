@@ -6,7 +6,8 @@ input_options <- function() {
             type = as.character,
             help = paste(
                 'Input object, can be SingleCellExperiment(sce), Seurat',
-                'object(seurat), CellDataSet V2(cds2) or V3(cds3).'
+                'object(seurat), CellDataSet V2(cds2) or V3(cds3).',
+                'Only cds3 is supported currently.'
             )
         ),
         make_option(
@@ -15,8 +16,8 @@ input_options <- function() {
             type = 'character',
             default = 'cds3',
             metavar = 'STR',
-            callback = check_choose_from(choices = c('sce', 'seurat', 'cds2', 'cds3')),
-            help = 'Format of input object, choose from {sce, seurat, cds2, cds3}. [Default: %default]'
+            callback = check_choose_from(choices = c('cds3')),
+            help = 'Format of input object. [Default: %default]'
         )
     )
 }
@@ -29,7 +30,8 @@ output_object_options <- function() {
             type = as.character,
             help = paste(
                 'Output object, can be SingleCellExperiment(sce), Seurat',
-                'object(seurat), or CellDataSet V3(cds3).'
+                'object(seurat), or CellDataSet V3(cds3).',
+                'Only cds3 is supported currently.'
             )
         ),
         make_option(
@@ -38,8 +40,8 @@ output_object_options <- function() {
             type = 'character',
             default = 'cds3',
             metavar = 'STR',
-            callback = check_choose_from(choices = c('sce', 'seurat', 'cds3')),
-            help = 'Format of output object, choose from {sce, seurat, cds3}. [Default: %default]'
+            callback = check_choose_from(choices = c('cds3')),
+            help = 'Format of output object. [Default: %default]'
         ),
         make_option(
             c('-I', '--introspective'),
@@ -112,6 +114,33 @@ common_options <- function() {
 
 function_options <- function(func_names) {
     func_options <- list(
+        #' Command line arguments for createCDS
+        createCDS = list(
+            make_option(
+                c('--expression-matrix'),
+                action = 'store',
+                type = 'character',
+                metavar = 'STR',
+                help = 'Expression matrix, genes as rows, cells as columns. Required input. Provide as TSV, CSV or RDS.'
+            ),
+            make_option(
+                c('--cell-metadata'),
+                action = 'store',
+                type = 'character',
+                default = NULL,
+                metavar = 'STR',
+                help = 'Per-cell annotation, optional. Row names must match the column names of the expression matrix. Provide as TSV, CSV or RDS.'
+            ),
+            make_option(
+                c('--gene-annotation'),
+                action = 'store',
+                type = 'character',
+                default = NULL,
+                metavar = 'STR',
+                help = 'Per-gene annotation, optional. Row names must match the row names of the expression matrix. Provide as TSV, CSV or RDS.'
+            )
+        ),
+        
         #' Command line arguments for preprocessCDS
         preprocessCDS = list(
             make_option(
@@ -120,8 +149,8 @@ function_options <- function(func_names) {
                 type = 'character',
                 default = 'PCA',
                 metavar = 'STR',
-                callback = check_choose_from(choices = c('PCA', 'none')),
-                help = 'The initial dimension method to use, choose from {PCA, none}. [Default: %default]'
+                callback = check_choose_from(choices = c('PCA', 'LSI')),
+                help = 'The initial dimension method to use, choose from {PCA, LSI}. [Default: %default]'
             ),
             make_option(
                 c('--num-dim'),
@@ -137,14 +166,36 @@ function_options <- function(func_names) {
                 type = 'character',
                 default = 'log',
                 metavar = 'STR',
-                callback = check_choose_from(choices = c('log', 'vstExprs', 'none')),
+                callback = check_choose_from(choices = c('log', 'size_only')),
                 help = paste(
                     'Determines how to transform expression values prior to reducing dimensionality,',
-                    'choose from {log, vstExprs, none}. [Default: %default]'
+                    'choose from {log, size_only}. [Default: %default]'
                 )
             ),
             make_option(
-                c('--pseudo-expr'),
+                c('--use-genes'),
+                action = 'store',
+                type = 'character',
+                default = NULL,
+                metavar = 'STR',
+                help = paste(
+                    'Manually subset the gene pool to these genes for dimensionality reduction,',
+                    'NULL to skip. [Default: %default]'
+                )
+            ),
+            make_option(
+                c('--residual-model-formula-str'),
+                action = 'store',
+                type = 'character',
+                default = NULL,
+                metavar = 'STR',
+                help = paste(
+                    'A string model formula specifying effects to subtract from the data,',
+                    'NULL to skip. [Default: %default]'
+                )
+            ),
+            make_option(
+                c('--pseudo-count'),
                 action = 'store',
                 type = 'numeric',
                 default = 1,
@@ -152,17 +203,6 @@ function_options <- function(func_names) {
                 help = paste(
                     'Amount to increase expression values before dimensionality',
                     'reduction. [Default: %default]'
-                )
-            ),
-            make_option(
-                c('--no-relative-expr'),
-                action = 'store_false',
-                type = 'logical',
-                dest = 'relative-expr',
-                default = TRUE,
-                help = paste(
-                    'When this option is NOT set, convert the expression into a',
-                    'relative expression.'
                 )
             ),
             make_option(
@@ -194,34 +234,34 @@ function_options <- function(func_names) {
                 type = 'character',
                 default = 'UMAP',
                 metavar = 'STR',
-                callback = check_choose_from(choices = c('UMAP', 'tSNE', 'DDRTree', 'ICA', 'none')),
+                callback = check_choose_from(choices = c('UMAP', 'tSNE', 'PCA', 'LSI')),
                 help = paste(
                     'The algorithm to use for dimensionality reduction,',
-                    'choose from {UMAP, tSNE, DDRTree, ICA, none}.',
+                    'choose from {UMAP, tSNE, PCA, LSI}.',
                     '[Default: %default]'
                 )
             ),
             make_option(
-                c('--no-auto-param-selection'),
-                action = 'store_false',
-                type = 'logical',
-                dest = 'auto-param-selection',
-                default = TRUE,
+                c('--preprocess-method'),
+                action = 'callback',
+                type = 'character',
+                default = 'PCA',
+                metavar = 'STR',
+                callback = check_choose_from(choices = c('PCA', 'LSI')),
                 help = paste(
-                    'When this option is NOT set, automatically calculation of',
-                    'the proper value for the parameter "ncenter" (number of',
-                    'centroids) which will be passed into DDRTree call.'
+                    'The preprocessing method used on the data,',
+                    'choose from {PCA, LSI}.',
+                    '[Default: %default]'
                 )
             ),
             make_option(
-                c('--no-scaling'),
-                action = 'store_false',
-                type = 'logical',
-                dest = 'scaling',
-                default = TRUE,
+                c('--cores'),
+                action = 'store',
+                type = 'integer',
+                default = 1,
                 help = paste(
-                    'When this option is NOT set, scale each gene before',
-                    'running trajectory reconstruction.'
+                    'The number of cores to be used for dimensionality reduction.',
+                    '[Default: %default]'
                 )
             )
         ),
@@ -229,25 +269,16 @@ function_options <- function(func_names) {
         #' Command line arguments for partitionCells
         partitionCells = list(
             make_option(
-                c('--partition-names'),
-                action = 'store',
+                c('--reduction-method'),
+                action = 'callback',
                 type = 'character',
-                default = NULL,
+                default = 'UMAP',
                 metavar = 'STR',
+                callback = check_choose_from(choices = c('UMAP', 'tSNE', 'PCA', 'LSI')),
                 help = paste(
-                    'Which partition groups (column in pData) should be used',
-                    'to calculate the connectivity between partitions.',
-                    '[Default %default]'
-                )
-            ),
-            make_option(
-                c('--use-pca'),
-                action = 'store_true',
-                type = 'logical',
-                default = FALSE,
-                help = paste(
-                    'When this option is set, cluster cells based on top PCA',
-                    'components.'
+                    'The dimensionality reduction to base the clustering on,',
+                    'choose from {UMAP, tSNE, PCA, LSI}.',
+                    '[Default: %default]'
                 )
             ),
             make_option(
@@ -289,99 +320,38 @@ function_options <- function(func_names) {
                 )
             ),
             make_option(
-                c('--louvain-qval'),
+                c('--partition-qval'),
                 action = 'store',
                 type = 'numeric',
                 default = 0.05,
                 metavar = 'FLOAT',
                 help = 'The q-value threshold used to determine the partition of cells. [Default: %default]'
-            ),
-            make_option(
-                c('--return-all'),
-                action = 'store_true',
-                type = 'logical',
-                default = FALSE,
-                help = paste(
-                    'When this option is set, return all saved objects from',
-                    'compute_louvain_connected_components().'
-                )
             )
         ),
 
         #' Command line arguments for learnGraph
         learnGraph = list(
             make_option(
-                c('--max-components'),
-                action = 'store',
-                type = 'integer',
-                default = 2,
-                metavar = 'INT',
-                help = 'The dimensionality of the reduced space. [Default %default]'
-            ),
-            make_option(
-                c('--rge-method'),
-                action = 'callback',
-                type = 'character',
-                default = 'SimplePPT',
-                metavar = 'STR',
-                callback = check_choose_from(c('SimplePPT', 'DDRTree')),
-                help = paste(
-                    'Determines how to transform expression values prior to reducing dimensionality.',
-                    '[Default: %default]'
-                )
-            ),
-            make_option(
-                c('--no-auto-param-selection'),
-                action = 'store_false',
-                type = 'logical',
-                dest = 'auto-param-selection',
-                default = TRUE,
-                help = paste(
-                    'When this option is NOT set, automatically calculation of',
-                    'the proper value for the parameter "ncenter" (number of',
-                    'centroids) which will be passed into DDRTree call.'
-                )
-            ),
-            make_option(
-                c('--partition-group'),
-                action = 'store',
-                type = 'character',
-                default = 'louvain_component',
-                metavar = 'STR',
-                help = paste(
-                    'Which partition groups (column in pData) should be used',
-                    'when learning separate trees for each partition. [Default: %default]'
-                )
-            ),
-            make_option(
                 c('--no-partition'),
                 action = 'store_false',
                 type = 'logical',
-                dest = 'do-partition',
+                dest = 'use-partition',
                 default = TRUE,
                 help = paste(
-                    'When this option is NOT set, learn a tree structure for',
-                    'each separate over-connected louvain component.'
+                    'When this option is set, learn a single tree structure for',
+                    'all the partitions. If not set, use the partitions calculated',
+                    'when clustering and identify disjoint graphs in each.'
                 )
             ),
             make_option(
-                c('--scale'),
-                action = 'store_true',
+                c('--no-close-loop'),
+                action = 'store_false',
                 type = 'logical',
-                default = FALSE,
+                dest = 'close-loop',
+                default = TRUE,
                 help = paste(
-                    'When this option is set, scale each gene before running',
-                    'trajectory reconstruction.'
-                )
-            ),
-            make_option(
-                c('--close-loop'),
-                action = 'store_true',
-                type = 'logical',
-                default = FALSE,
-                help = paste(
-                    'When this option is set, perform an additional run of loop',
-                    'closing after running DDRTree or SimplePPT to identify',
+                    'When this option is set, skip the additional run of loop',
+                    'closing after computing the principal graphs to identify',
                     'potential loop structure in the data space.'
                 )
             ),
@@ -400,7 +370,7 @@ function_options <- function(func_names) {
                 )
             ),
             make_option(
-                c('--geodestic-distance-ratio'),
+                c('--geodesic-distance-ratio'),
                 action = 'store',
                 type = 'numeric',
                 default = 1/3,
@@ -473,6 +443,19 @@ function_options <- function(func_names) {
                     'The value of the phenotype specified by "--cell-pheontype"',
                     'that defines cells root principal nodes.'
                 )
+            ),
+            make_option(
+                c('--reduction-method'),
+                action = 'callback',
+                type = 'character',
+                default = 'UMAP',
+                metavar = 'STR',
+                callback = check_choose_from(choices = c('UMAP', 'tSNE', 'PCA', 'LSI')),
+                help = paste(
+                    'The dimensionality reduction that was used for clustering,',
+                    'choose from {UMAP, tSNE, PCA, LSI}.',
+                    '[Default: %default]'
+                )
             )
         ),
 
@@ -487,7 +470,7 @@ function_options <- function(func_names) {
                 help = paste(strwrap(paste(
                     'The starting principal points. We learn a principal graph',
                     'that passes through the middle of the data points and use',
-                    'it to represent the developmental process.'
+                    'it to represent the developmental process. Exclusive with --root-cells.'
                 ), initial = '', prefix = '\t\t'), collapse='\n')
             ),
             make_option(
@@ -499,27 +482,7 @@ function_options <- function(func_names) {
                 help = paste(
                     'The starting cells. Each cell corresponds to a principal',
                     'point and multiple cells can correspond to the same',
-                    'principal point.'
-                )
-            ),
-            make_option(
-                c('--reverse'),
-                action = 'store_true',
-                type = 'logical',
-                default = FALSE,
-                help = paste(
-                    'When this option is set, reverse the direction of the',
-                    'trajectory.'
-                )
-            ),
-            make_option(
-                c('--orthogonal-proj-tip'),
-                action = 'store_true',
-                type = 'logical',
-                default = FALSE,
-                help = paste(
-                    'When this option is set, perform orthogonal projection for',
-                    'cells corresponding to the tip principal points.'
+                    'principal point. Exclusive with --root-pr-nodes.'
                 )
             )
         ),
@@ -527,14 +490,29 @@ function_options <- function(func_names) {
         #' Command line arguments for principalGraphTest
         principalGraphTest = list(
             make_option(
-                c('--no-relative-expr'),
-                action = 'store_false',
-                type = 'logical',
-                dest = 'relative-expr',
-                default = TRUE,
+                c('--neighbor-graph'),
+                action = 'callback',
+                type = 'character',
+                default = 'knn',
+                metavar = 'STR',
+                callback = check_choose_from(choices = c('principal_graph','knn')),
                 help = paste(
-                    'When this option is NOT set, convert the expression into a',
-                    'relative expression.'
+                    'What neighbor graph to use, "principal_graph" recommended for trajectory analysis,',
+                    'choose from {principal_graph, knn}.',
+                    '[Default: %default]'
+                )
+            ),
+            make_option(
+                c('--reduction-method'),
+                action = 'callback',
+                type = 'character',
+                default = 'UMAP',
+                metavar = 'STR',
+                callback = check_choose_from(choices = c('UMAP')),
+                help = paste(
+                    'The dimensionality reduction to base the clustering on,',
+                    'choose from {UMAP}.',
+                    '[Default: %default]'
                 )
             ),
             make_option(
@@ -554,12 +532,12 @@ function_options <- function(func_names) {
                 action = 'callback',
                 type = 'character',
                 default = 'Moran_I',
-                callback = check_choose_from(c('Moran_I', 'Geary_C')),
+                callback = check_choose_from(c('Moran_I')),
                 help = paste(
                     'A character string specifying the method for detecting',
                     'significant genes showing correlated expression along the',
                     'principal graph embedded in the low dimensional space,',
-                    'choose from {Moran_I, Geary_C}. [Default: %default]'
+                    'choose from {Moran_I}. [Default: %default]'
                 )
             ),
             make_option(
@@ -581,17 +559,6 @@ function_options <- function(func_names) {
                 help = paste(
                     'The number of cores to be used while testing each gene for',
                     'differential expression. [Default: %default]'
-                )
-            ),
-            make_option(
-                c('--interactive'),
-                action = 'store_true',
-                type = 'logical',
-                default = FALSE,
-                help = paste(
-                    'When this option is set, allow user to choose a point or',
-                    'region in the scene, then to only identify genes spatially',
-                    'correlated for those selected cells.'
                 )
             )
         ),
@@ -621,81 +588,50 @@ function_options <- function(func_names) {
                 )
             ),
             make_option(
-                c('--color-by'),
+                c('--reduction-method'),
+                action = 'callback',
+                type = 'character',
+                default = 'UMAP',
+                metavar = 'STR',
+                callback = check_choose_from(choices = c('UMAP', 'tSNE', 'PCA', 'LSI')),
+                help = paste(
+                    'The dimensionality reduction for plotting,',
+                    'choose from {UMAP, tSNE, PCA, LSI}.',
+                    '[Default: %default]'
+                )
+            ),
+            make_option(
+                c('--color-cells-by'),
                 action = 'store',
                 type = 'character',
-                default = 'Pseudotime',
+                default = 'pseudotime',
                 help = paste(
                     'The cell attribute (e.g. the column of pData(cds)) to map',
-                    'to each cell\'s color. [Default: %default]'
+                    'to each cell\'s color, or one of {clusters, partitions, pseudotime}.',
+                    '[Default: %default]'
                 )
             ),
             make_option(
-                c('--hide-backbone'),
-                action = 'store_false',
-                type = 'logical',
-                dest = 'show-backbone',
-                default = TRUE,
-                help = paste(
-                    'When this option is NOT set, show the diameter path of the',
-                    'MST used to order the cell.'
-                )
-            ),
-            make_option(
-                c('--backbone-color'),
-                action = 'store',
-                type = 'character',
-                default = 'black',
-                help = paste(
-                    'The color used to render the backbone. [Default: %default]'
-                )
-            ),
-            make_option(
-                c('--markers'),
+                c('--genes'),
                 action = 'store',
                 type = 'character',
                 default = NULL,
+                metavar = 'STR',
                 help = paste(
-                    'A gene name or gene id to use for setting the size of each',
-                    'cell in the plot. [Default: %default]'
+                    'A list of gene IDs/short names to plot, one per panel.'
                 )
             ),
             make_option(
-                c('--use-color-gradient'),
-                action = 'store_true',
-                type = 'logical',
-                default = FALSE,
+                c('--norm-method'),
+                action = 'callback',
+                type = 'character',
+                default = 'log',
+                metavar = 'STR',
+                callback = check_choose_from(choices = c('log', 'size_only')),
                 help = paste(
-                    'When this option is set, use color gradient instead of',
-                    'cell size to show marker expression level.'
+                    'Determines how to transform expression values for plotting,',
+                    'choose from {log, size_only}. [Default: %default]'
                 )
-            ),
-            make_option(
-                c('--markers-linear'),
-                action = 'store_true',
-                type = 'logical',
-                default = FALSE,
-                help = paste(
-                    'When this option is set, scale the markers linearly,',
-                    'otherwise scale them logarithimically.'
-                )
-            ),
-            make_option(
-                c('--show-cell-names'),
-                action = 'store_true',
-                type = 'logical',
-                default = FALSE,
-                help = paste(
-                    'When this option is set, draw the name of each cell in',
-                    'the plot.'
-                )
-            ),
-            make_option(
-                c('--show-state-number'),
-                action = 'store_true',
-                type = 'logical',
-                default = FALSE,
-                help = 'When this option is set, show state number'
             ),
             make_option(
                 c('--cell-size'),
@@ -705,49 +641,6 @@ function_options <- function(func_names) {
                 help = 'The size of the point for each cell. [Default: %default]'
             ),
             make_option(
-                c('--cell-link-size'),
-                action = 'store',
-                type = 'numeric',
-                default = 0.75,
-                help = paste(
-                    'The size of the line segments connecting cells (when used',
-                    'with ICA) or the principal graph (when used with DDRTree.',
-                    '[Default: %default]'
-                )
-            ),
-            make_option(
-                c('--cell-name-size'),
-                action = 'store',
-                type = 'numeric',
-                default = 2,
-                help = 'The size of cell name label. [Default: %default]'
-            ),
-            make_option(
-                c('--state-number-size'),
-                action = 'store',
-                type = 'numeric',
-                default = 2,
-                help = 'The size of the state number. [Default: %default]'
-            ),
-            make_option(
-                c('--hide-branch-points'),
-                action = 'store_false',
-                type = 'logical',
-                dest = 'show-branch-points',
-                default = TRUE,
-                help = paste(
-                    'When this option is NOT set, show icons for each branch',
-                    'point (only available after running assign_cell_states)'
-                )
-            ),
-            make_option(
-                c('--theta'),
-                action = 'store',
-                type = 'numeric',
-                default = 0,
-                help = 'Degree to rotate the trajectory'
-            ),
-            make_option(
                 c('--alpha'),
                 action = 'store',
                 type = 'numeric',
@@ -755,6 +648,65 @@ function_options <- function(func_names) {
                 help = paste(
                     'The alpha aesthetics for the original cell points, useful',
                     'to highlight the learned principal graph.'
+                )
+            ),
+            make_option(
+                c('--label-cell-groups'),
+                action = 'store_true',
+                type = 'logical',
+                default = FALSE,
+                help = paste(
+                    'If set, display the cell group names directly on the plot.',
+                    'Otherwise include a color legend on the side of the plot.'
+                )
+            ),
+            make_option(
+                c('--no-trajectory-graph'),
+                action = 'store_false',
+                type = 'logical',
+                dest = 'show-trajectory-graph',
+                default = TRUE,
+                help = paste(
+                    'When this option is set, skip displaying the trajectory graph',
+                    'inferred by learn_graph().'
+                )
+            ),
+            make_option(
+                c('--label-groups-by-cluster'),
+                action = 'store_true',
+                type = 'logical',
+                default = FALSE,
+                help = paste(
+                    'If set, and setting --color-cells-by to something other than cluster,',
+                    'label the cells of each cluster independently. Can result in duplicate',
+                    'labels being present in the manifold.'
+                )
+            ),
+            make_option(
+                c('--label-leaves'),
+                action = 'store_true',
+                type = 'logical',
+                default = FALSE,
+                help = paste(
+                    'If set, label the leaves of the principal graph.'
+                )
+            ),
+            make_option(
+                c('--label-roots'),
+                action = 'store_true',
+                type = 'logical',
+                default = FALSE,
+                help = paste(
+                    'If set, label the roots of the principal graph.'
+                )
+            ),
+            make_option(
+                c('--label-branch-points'),
+                action = 'store_true',
+                type = 'logical',
+                default = FALSE,
+                help = paste(
+                    'If set, label the branch points of the principal graph.'
                 )
             )
         )

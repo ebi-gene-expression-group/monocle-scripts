@@ -5,21 +5,27 @@ setup() {
     test_dir="post_install_tests"
     data_dir="${test_dir}/data"
     output_dir="${test_dir}/outputs"
-    input_url='http://trapnell-lab.gs.washington.edu/public_share/valid_subset_GSE72857_cds2.RDS'
-    input_rds="${data_dir}/input.rds"
-    preprocess_opt="-f cds2 --method PCA --num-dim 50 --norm-method log --pseudo-expr 1"
+    exprs_url="http://staff.washington.edu/hpliner/data/packer_embryo_expression.rds"
+    exprs_rds="${data_dir}/exprs.rds"
+    obs_url="http://staff.washington.edu/hpliner/data/packer_embryo_colData.rds"
+    obs_rds="${data_dir}/obs.rds"
+    var_url="http://staff.washington.edu/hpliner/data/packer_embryo_rowData.rds"
+    var_rds="${data_dir}/var.rds"
+    create_opt="--expression-matrix $exprs_rds --cell-metadata $obs_rds --gene-annotation $var_rds"
+    create_rds="${output_dir}/create.rds"
+    preprocess_opt="-f cds3 --method PCA --num-dim 50 --norm-method log --pseudo-count 1"
     preprocess_rds="${output_dir}/preprocess.rds"
-    reduceDim_opt="--max-components 2 --reduction-method UMAP"
+    reduceDim_opt="--max-components 2 --reduction-method UMAP --preprocess-method PCA"
     reduceDim_rds="${output_dir}/reduceDim.rds"
     partition_opt="--knn 20 --louvain-iter 1"
     partition_rds="${output_dir}/partition.rds"
-    learnGraph_opt="--max-components 2 --rge-method SimplePPT --partition-group louvain_component --euclidean-distance-ratio 1 --geodestic-distance-ratio 0.333 --minimal-branch-len 10"
+    learnGraph_opt="--minimal-branch-len 15"
     learnGraph_rds="${output_dir}/learnGraph.rds"
-    orderCells_opt="--cell-phenotype cell_type2 --root-type MP/EP"
+    orderCells_opt="--cell-phenotype embryo.time.bin --root-type 130-170 --reduction-method UMAP"
     orderCells_rds="${output_dir}/orderCells.rds"
     diffExp_opt="-F tsv --knn 25 --method Moran_I --alternative greater --cores 2"
     diffExp_tbl="${output_dir}/diffExp.tsv"
-    plotCells_opt="-F png --xdim 2 --ydim 1 --color-by Pseudotime --backbone-color grey --cell-size 1 --alpha 0.2"
+    plotCells_opt="-F png --xdim 2 --ydim 1 --color-cells-by pseudotime --reduction-method UMAP --cell-size 1 --alpha 0.2"
     plotCells_plt="${output_dir}/plotCells.png"
 
     if [ ! -e "$output_dir" ]; then
@@ -30,14 +36,28 @@ setup() {
 # Download data
 
 @test "Download example data" {
-    if [ -f "$input_rds" ]; then
-        skip "$input_rds already exists"
+    if [ -f "$exprs_rds" ]; then
+        skip "$exprs_rds already exists"
     fi
 
-    run mkdir -p $data_dir && wget $input_url -O $input_rds
+    run mkdir -p $data_dir && wget $exprs_url -O $exprs_rds && wget $obs_url -O $obs_rds && wget $var_url -O $var_rds
 
     [ "$status" -eq 0 ]
-    [ -f "$input_rds" ]
+    [ -f "$exprs_rds" ]
+}
+
+# Create object
+
+@test "Create" {
+    if [ "$resume" = 'true' ] && [ -f "$create_rds" ]; then
+        skip "$create_rds exists and resume is set to 'true'"
+    fi
+    
+    echo "$monocle create $create_rds $create_opt"
+    run $monocle create $create_rds $create_opt
+    
+    [ "$status" -eq 0 ]
+    [ -f "$create_rds" ]
 }
 
 # Preprocess data
@@ -47,8 +67,8 @@ setup() {
         skip "$preprocess_rds exists and resume is set to 'true'"
     fi
 
-    echo "$monocle preprocess $preprocess_opt $input_rds $preprocess_rds"
-    run $monocle preprocess $preprocess_opt $input_rds $preprocess_rds
+    echo "$monocle preprocess $preprocess_opt $create_rds $preprocess_rds"
+    run $monocle preprocess $preprocess_opt $create_rds $preprocess_rds
 
     [ "$status" -eq 0 ]
     [ -f "$preprocess_rds" ]

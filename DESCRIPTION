@@ -1,8 +1,9 @@
 Package: MonocleScripts
 Title: Command line scripts for Monocle3
 Version: 0.0.2
-Authors@R: person('Ni', 'Huang', email = 'nh3@users.noreply.github.com',
-                  role=c('aut', 'cre'))
+Authors@R: c(
+    person('Ni', 'Huang', email='nh3@users.noreply.github.com', role=c('aut', 'cre')),
+    person('Krzysztof', 'Polanski', email='ktpolanski@users.noreply.github.com', role='aut'))
 Description: This package provides a set of command line wrapper scripts for
     Monocle3 functions to facilitate building flexible workflows using different
     frameworks.

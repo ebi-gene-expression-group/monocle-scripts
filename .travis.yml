@@ -43,7 +43,8 @@ before_install:
 install:
   - export PATH="$HOME/miniconda/bin:$PATH"
   - source activate "$TEST_ENV"
-  - Rscript -e 'devtools::install(".")'
+  - R CMD INSTALL .
+  - cp $HOME/miniconda/envs/$TEST_ENV/lib/R/library/MonocleScripts/exec/monocle3 $HOME/miniconda/envs/$TEST_ENV/bin/
 
 before_script:
   - export PATH=`pwd`:$PATH

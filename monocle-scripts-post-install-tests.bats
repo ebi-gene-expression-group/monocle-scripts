@@ -1,7 +1,7 @@
 #!/usr/bin/env bats
 
 setup() {
-    monocle="$CONDA_PREFIX/lib/R/library/MonocleScripts/exec/monocle3"
+    monocle="monocle3"
     test_dir="post_install_tests"
     data_dir="${test_dir}/data"
     output_dir="${test_dir}/outputs"

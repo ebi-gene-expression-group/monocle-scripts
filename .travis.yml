@@ -44,7 +44,7 @@ install:
   - export PATH="$HOME/miniconda/bin:$PATH"
   - source activate "$TEST_ENV"
   - R CMD INSTALL .
-  - cp $HOME/miniconda/envs/$TEST_ENV/lib/R/library/monocle3/exec/monocle3 $HOME/miniconda/envs/$TEST_ENV/bin/
+  - cp $HOME/miniconda/envs/$TEST_ENV/lib/R/library/MonocleScripts/exec/monocle3 $HOME/miniconda/envs/$TEST_ENV/bin/
 
 before_script:
   - export PATH=`pwd`:$PATH

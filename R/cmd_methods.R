@@ -124,6 +124,8 @@ monocle_create <- function(
         {
             if (toupper(substr(file, nchar(file)-2, nchar(file))) == 'RDS')
                 assign(var, readRDS(file))
+            else if (toupper(substr(file, nchar(file)-2, nchar(file))) == 'MTX')
+                assign(var, Matrix::readMM(file))
             else if (toupper(substr(file, nchar(file)-2, nchar(file))) == 'TSV')
                 assign(var, read.delim(file, row.names = 1, stringsAsFactors = FALSE))
             else

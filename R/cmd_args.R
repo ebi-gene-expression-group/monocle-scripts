@@ -121,7 +121,7 @@ function_options <- function(func_names) {
                 action = 'store',
                 type = 'character',
                 metavar = 'STR',
-                help = 'Expression matrix, genes as rows, cells as columns. Required input. Provide as TSV, CSV or RDS.'
+                help = 'Expression matrix, genes as rows, cells as columns. Required input. Provide as TSV, CSV, RDS or MTX.'
             ),
             make_option(
                 c('--cell-metadata'),

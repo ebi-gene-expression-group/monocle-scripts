@@ -7,11 +7,12 @@ setup() {
     output_dir="${test_dir}/outputs"
     exprs_url="http://staff.washington.edu/hpliner/data/packer_embryo_expression.rds"
     exprs_rds="${data_dir}/exprs.rds"
+    exprs_mtx="${data_dir}/exprs.mtx"
     obs_url="http://staff.washington.edu/hpliner/data/packer_embryo_colData.rds"
     obs_rds="${data_dir}/obs.rds"
     var_url="http://staff.washington.edu/hpliner/data/packer_embryo_rowData.rds"
     var_rds="${data_dir}/var.rds"
-    create_opt="--expression-matrix $exprs_rds --cell-metadata $obs_rds --gene-annotation $var_rds"
+    create_opt="--expression-matrix $exprs_mtx --cell-metadata $obs_rds --gene-annotation $var_rds"
     create_rds="${output_dir}/create.rds"
     preprocess_opt="-f cds3 --method PCA --num-dim 50 --norm-method log --pseudo-count 1"
     preprocess_rds="${output_dir}/preprocess.rds"
@@ -44,6 +45,17 @@ setup() {
 
     [ "$status" -eq 0 ]
     [ -f "$exprs_rds" ]
+
+}
+
+@test "Create .mtx input" {
+     if [ -f "$exprs_mtx" ]; then
+        skip "$exprs_mtx already exists"
+    fi 
+
+    run Rscript -e "mat=readRDS(commandArgs(TRUE)[1]);Matrix::writeMM(mat,commandArgs(TRUE)[2])" ${exprs_rds} ${exprs_mtx}
+    [ "$status" -eq 0 ]
+    [ -f "$exprs_mtx" ]
 }
 
 # Create object

@@ -65,7 +65,7 @@ Options:
 		Print introspective information of the output object.
 
 	--expression-matrix=STR
-		Expression matrix, genes as rows, cells as columns. Required input. Provide as TSV, CSV or RDS.
+		Expression matrix, genes as rows, cells as columns. Required input. Provide as TSV, CSV, RDS or MTX.
 
 	--cell-metadata=STR
 		Per-cell annotation, optional. Row names must match the column names of the expression matrix. Provide as TSV, CSV or RDS.

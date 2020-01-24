@@ -14,6 +14,12 @@ setup() {
     var_rds="${data_dir}/var.rds"
     create_opt="--expression-matrix $exprs_mtx --cell-metadata $obs_rds --gene-annotation $var_rds"
     create_rds="${output_dir}/create.rds"
+    tsv_file="${test_dir}/matrix.tsv"
+    tsv_opt="--expression-matrix $tsv_file"
+    tsv_rds="${output_dir}/tsv.rds"
+    csv_file="${test_dir}/matrix.csv"
+    csv_opt="--expression-matrix $csv_file"
+    csv_rds="${output_dir}/csv.rds"
     preprocess_opt="-f cds3 --method PCA --num-dim 50 --norm-method log --pseudo-count 1"
     preprocess_rds="${output_dir}/preprocess.rds"
     reduceDim_opt="--max-components 2 --reduction-method UMAP --preprocess-method PCA"
@@ -70,6 +76,34 @@ setup() {
     
     [ "$status" -eq 0 ]
     [ -f "$create_rds" ]
+}
+
+@test "Create from .tsv" {
+    if [ "$resume" = 'true' ] && [ -f "$tsv_rds" ]; then
+        skip "$tsv_rds exists and resume is set to 'true'"
+    fi
+    
+    run echo -e "genes\tMGH100-P5-A01\tMGH100-P5-A03\nA1BG\t4.13\t2.17\nA1BG-AS1\t0\t5.57" > $tsv_file
+    
+    echo "$monocle create $tsv_rds $tsv_opt"
+    run $monocle create $tsv_rds $tsv_opt
+    
+    [ "$status" -eq 0 ]
+    [ -f "$tsv_rds" ]
+}
+
+@test "Create from .csv" {
+    if [ "$resume" = 'true' ] && [ -f "$csv_rds" ]; then
+        skip "$csv_rds exists and resume is set to 'true'"
+    fi
+    
+    run echo -e "genes,MGH100-P5-A01,MGH100-P5-A03\nA1BG,4.13,2.17\nA1BG-AS1,0,5.57" > $csv_file
+    
+    echo "$monocle create $csv_rds $csv_opt"
+    run $monocle create $csv_rds $csv_opt
+    
+    [ "$status" -eq 0 ]
+    [ -f "$csv_rds" ]
 }
 
 # Preprocess data

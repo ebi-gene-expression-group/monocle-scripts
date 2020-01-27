@@ -82,7 +82,7 @@ setup() {
     fi
     
     echo "echo -e [...] > $csv_file"
-    run echo -e "genes,MGH100-P5-A01,MGH100-P5-A03\nA1BG,4.13,2.17\nA1BG-AS1,0,5.57" > $csv_file
+    run echo "genes,MGH100-P5-A01,MGH100-P5-A03" > $csv_file && echo "A1BG,4.13,2.17" >> $csv_file && echo "A1BG-AS1,0,5.57" >> $csv_file
     
     [ "$status" -eq 0 ]
     [ -f "$csv_file" ]

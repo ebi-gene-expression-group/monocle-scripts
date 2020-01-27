@@ -64,6 +64,30 @@ setup() {
     [ -f "$exprs_mtx" ]
 }
 
+@test "Create .tsv input" {
+    if [ "$resume" = 'true' ] && [ -f "$tsv_file" ]; then
+        skip "$tsv_file exists and resume is set to 'true'"
+    fi
+    
+    echo "echo -e [...] > $tsv_file"
+    run echo -e "genes\tMGH100-P5-A01\tMGH100-P5-A03\nA1BG\t4.13\t2.17\nA1BG-AS1\t0\t5.57" > $tsv_file
+    
+    [ "$status" -eq 0 ]
+    [ -f "$tsv_file" ]
+}
+
+@test "Create .csv input" {
+    if [ "$resume" = 'true' ] && [ -f "$csv_file" ]; then
+        skip "$csv_file exists and resume is set to 'true'"
+    fi
+    
+    echo "echo -e [...] > $csv_file"
+    run echo -e "genes,MGH100-P5-A01,MGH100-P5-A03\nA1BG,4.13,2.17\nA1BG-AS1,0,5.57" > $csv_file
+    
+    [ "$status" -eq 0 ]
+    [ -f "$csv_file" ]
+}
+
 # Create object
 
 @test "Create" {
@@ -84,7 +108,7 @@ setup() {
     fi
     
     echo "$monocle create $tsv_rds $tsv_opt"
-    run echo -e "genes\tMGH100-P5-A01\tMGH100-P5-A03\nA1BG\t4.13\t2.17\nA1BG-AS1\t0\t5.57" > $tsv_file && $monocle create $tsv_rds $tsv_opt
+    run $monocle create $tsv_rds $tsv_opt
     
     [ "$status" -eq 0 ]
     [ -f "$tsv_rds" ]
@@ -96,7 +120,7 @@ setup() {
     fi
     
     echo "$monocle create $csv_rds $csv_opt"
-    run echo -e "genes,MGH100-P5-A01,MGH100-P5-A03\nA1BG,4.13,2.17\nA1BG-AS1,0,5.57" > $csv_file && $monocle create $csv_rds $csv_opt
+    run $monocle create $csv_rds $csv_opt
     
     [ "$status" -eq 0 ]
     [ -f "$csv_rds" ]

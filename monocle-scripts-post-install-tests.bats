@@ -82,7 +82,7 @@ setup() {
     fi
     
     echo "printf [...] > $tsv_file"
-    run printf "genes\tMGH100-P5-A01\tMGH100-P5-A03\nA1BG\t4.13\t2.17\nA1BG-AS1,0,5.57" > $tsv_file
+    run printf 'genes\tMGH100-P5-A01\tMGH100-P5-A03\nA1BG\t4.13\t2.17\nA1BG-AS1\t0\t5.57\n' > $tsv_file
     
     [ "$status" -eq 0 ]
     [ -f "$tsv_file" ]

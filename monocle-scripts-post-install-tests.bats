@@ -81,8 +81,8 @@ setup() {
         skip "$tsv_file exists and resume is set to 'true'"
     fi
     
-    echo "sed 's/,/\t/g' $csv_file > $tsv_file"
-    run sed 's/,/\t/g' $csv_file > $tsv_file
+    echo "printf [...] > $tsv_file"
+    run printf "genes\tMGH100-P5-A01\tMGH100-P5-A03\nA1BG\t4.13\t2.17\nA1BG-AS1,0,5.57" > $tsv_file
     
     [ "$status" -eq 0 ]
     [ -f "$tsv_file" ]
@@ -107,7 +107,7 @@ setup() {
         skip "$csv_rds exists and resume is set to 'true'"
     fi
     
-    echo `wc -l $csv_file`
+    echo `$monocle create $csv_rds $csv_opt`
     run $monocle create $csv_rds $csv_opt
     
     [ "$status" -eq 0 ]

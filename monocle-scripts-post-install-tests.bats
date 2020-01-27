@@ -107,7 +107,7 @@ setup() {
         skip "$tsv_rds exists and resume is set to 'true'"
     fi
     
-    echo "$monocle create $tsv_rds $tsv_opt"
+    echo "cat $tsv_file"
     run $monocle create $tsv_rds $tsv_opt
     
     [ "$status" -eq 0 ]
@@ -119,7 +119,7 @@ setup() {
         skip "$csv_rds exists and resume is set to 'true'"
     fi
     
-    echo "$monocle create $csv_rds $csv_opt"
+    echo "cat $csv_file"
     run $monocle create $csv_rds $csv_opt
     
     [ "$status" -eq 0 ]

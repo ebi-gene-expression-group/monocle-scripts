@@ -115,7 +115,7 @@ monocle_create <- function(
     }
     #the three constituents of the new_cell_data_set() call
     #are passed as arguments to the function, and live in this list
-    for (var in c('expression_matrix', 'cell_metadata', 'gene_annotation'))
+    for (var in c('expression_matrix','cell_metadata', 'gene_annotation'))
     {
         file = createCDS_options[[var]]
         if (is.null(file))
@@ -127,9 +127,19 @@ monocle_create <- function(
             else if (toupper(substr(file, nchar(file)-2, nchar(file))) == 'MTX')
                 assign(var, Matrix::readMM(file))
             else if (toupper(substr(file, nchar(file)-2, nchar(file))) == 'TSV')
+            {
                 assign(var, as.matrix(read.delim(file, row.names = 1, stringsAsFactors = FALSE)))
+                #dimensionality check to account for the possible lack of a header
+                if (dim(get(var))[1] != dim(expression_matrix)[2])
+                    assign(var, as.matrix(read.delim(file, row.names = 1, header=FALSE, stringsAsFactors = FALSE)))
+            }
             else
+            {
                 assign(var, as.matrix(read.csv(file, row.names = 1, stringsAsFactors = FALSE)))
+                #dimensionality check to account for the possible lack of a header
+                if (dim(get(var))[1] != dim(expression_matrix)[2])
+                    assign(var, as.matrix(read.delim(file, row.names = 1, header=FALSE, stringsAsFactors = FALSE)))
+            }
         }
     }
 

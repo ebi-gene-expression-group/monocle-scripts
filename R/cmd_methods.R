@@ -131,17 +131,17 @@ monocle_create <- function(
                 d = read.table(file, header = FALSE, sep = sep, stringsAsFactors = FALSE)
                 row.names(d) = r[,1]
                 return(d)
-            } else {
+            } else if (file_type == 'gene_annotation') {
                 return(read.table(file, row.names = 1, sep = sep, header = FALSE, stringsAsFactors = FALSE))
             }
         }
     }
     expression_matrix = .parse_input_data('expression_matrix')
     cell_metadata = .parse_input_data('cell_metadata')
-    gene_metadata = .parse_input_data('gene_metadata')
+    gene_annotation = .parse_input_data('gene_annotation')
 
     # matrix entries need to be named
-    row.names(expr_matrix) = row.names(gene_metadata)
+    row.names(expr_matrix) = row.names(gene_annotation)
     colnames(expr_matrix) = row.names(cell_metadata)
 
     cds = new_cell_data_set(expression_matrix,

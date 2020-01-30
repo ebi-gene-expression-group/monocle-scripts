@@ -141,8 +141,8 @@ monocle_create <- function(
     gene_metadata = .parse_input_data('gene_metadata')
 
     # matrix entries need to be named
-    row.names(expr_matrix) = row.names(genes)
-    colnames(expr_matrix) = row.names(barcodes)
+    row.names(expr_matrix) = row.names(gene_metadata)
+    colnames(expr_matrix) = row.names(cell_metadata)
 
     cds = new_cell_data_set(expression_matrix,
                             cell_metadata = cell_metadata,

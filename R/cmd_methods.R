@@ -157,7 +157,7 @@ monocle_create <- function(
 
             rownames(mat) <- mat[,1]
             if (ncol(mat) > 1){
-                mat <- mat[,-11]
+                mat <- mat[,-1]
             }
 
             mat <- as.matrix(mat)

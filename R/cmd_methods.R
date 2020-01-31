@@ -113,6 +113,14 @@ monocle_create <- function(
         message('You need to provide the expression matrix by --expression-matrix. Aborting.')
         q(save = 'no', status = 1)
     }
+    #helper variable for dimension compatibility check later
+    #a newly imported TSV/CSV's dimension 1 is compared against the count matrix dimension...?
+    dims = list()
+    #introduces less logic downstream to just have it check itself
+    dims[['expression_matrix']] = 1
+    dims[['cell_metadata']] = 2
+    dims[['gene_annotation']] = 1
+    
     #the three constituents of the new_cell_data_set() call
     #are passed as arguments to the function, and live in this list
     for (var in c('expression_matrix','cell_metadata', 'gene_annotation'))
@@ -130,14 +138,14 @@ monocle_create <- function(
             {
                 assign(var, as.matrix(read.delim(file, row.names = 1, stringsAsFactors = FALSE)))
                 #dimensionality check to account for the possible lack of a header
-                if (dim(get(var))[1] != dim(expression_matrix)[2])
+                if (dim(get(var))[1] != dim(expression_matrix)[dims[[var]]])
                     assign(var, as.matrix(read.delim(file, row.names = 1, header=FALSE, stringsAsFactors = FALSE)))
             }
             else
             {
                 assign(var, as.matrix(read.csv(file, row.names = 1, stringsAsFactors = FALSE)))
                 #dimensionality check to account for the possible lack of a header
-                if (dim(get(var))[1] != dim(expression_matrix)[2])
+                if (dim(get(var))[1] != dim(expression_matrix)[dims[[var]]])
                     assign(var, as.matrix(read.delim(file, row.names = 1, header=FALSE, stringsAsFactors = FALSE)))
             }
         }

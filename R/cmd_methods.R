@@ -151,8 +151,12 @@ monocle_create <- function(
     gene_annotation = .parse_input_data('gene_annotation')
 
     # matrix entries need to be named
-    row.names(expression_matrix) = row.names(gene_annotation)
-    colnames(expression_matrix) = row.names(cell_metadata)
+    if(!is.null(gene_annotation)){
+        row.names(expression_matrix) = row.names(gene_annotation)
+    }
+    if(!is.null(cell_metadata)){
+        colnames(expression_matrix) = row.names(cell_metadata)
+    }
 
     cds = new_cell_data_set(expression_matrix,
                             cell_metadata = cell_metadata,

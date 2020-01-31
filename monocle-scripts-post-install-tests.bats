@@ -84,8 +84,9 @@ setup() {
     fi
     
     echo "$monocle create $csv_rds $csv_opt"
-    run eval "printf 'genes,MGH100-P5-A01,MGH100-P5-A03\nA1BG,4.13,2.17\nA1BG-AS1,0,5.57\n' > $csv_file" && $monocle create $csv_rds $csv_opt
-    
+    eval "printf 'GENES,MGH100-P5-A01,MGH100-P5-A03\nA1BG,4.13,2.17\nA1BG-AS1,0,5.57\n' > $csv_file"
+    run $monocle create $csv_rds $csv_opt
+
     [ "$status" -eq 0 ]
     [ -f "$csv_rds" ]
 }
@@ -96,7 +97,8 @@ setup() {
     fi
     
     echo "$monocle create $tsv_rds $tsv_opt"
-    run eval "printf 'genes\tMGH100-P5-A01\tMGH100-P5-A03\nA1BG\t4.13\t2.17\nA1BG-AS1\t0\t5.57\n' > $tsv_file" && $monocle create $tsv_rds $tsv_opt
+    eval "printf 'genes\tMGH100-P5-A01\tMGH100-P5-A03\nA1BG\t4.13\t2.17\nA1BG-AS1\t0\t5.57\n' > $tsv_file" 
+    run $monocle create $tsv_rds $tsv_opt
     
     [ "$status" -eq 0 ]
     [ -f "$tsv_rds" ]

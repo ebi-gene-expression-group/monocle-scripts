@@ -115,34 +115,52 @@ monocle_create <- function(
     }
 
     .parse_input_data = function(file_type){
+        if(! file_type %in% c('expression_matrix', 'cell_metadata', 'gene_annotation'))
+            stop(paste("Incorrect argument provided", file_type))
+
         file = createCDS_options[[file_type]]
-        if (is.null(file)) return(NULL)
-        else {
-            if (toupper(substr(file, nchar(file)-2, nchar(file))) == 'RDS') return(readRDS(file))
-            else if (toupper(substr(file, nchar(file)-2, nchar(file))) == 'MTX') return(Matrix::readMM(file))
-            # handle different text formats
-            else if (toupper(substr(file, nchar(file)-2, nchar(file))) == 'TSV') sep = "\t"
-            else sep = ","
-            # different parsing method depending on type of file 
-            if(file_type == 'expression_matrix'){
-                return(as.matrix(read.delim(file, row.names=1, sep = sep, stringsAsFactors = FALSE)))
-            } else if (file_type == 'cell_metadata'){
-                # barcodes are given as single column, can't use index
-                d = read.table(file, header = FALSE, sep = sep, stringsAsFactors = FALSE)
-                row.names(d) = r[,1]
-                return(d)
-            } else if (file_type == 'gene_annotation') {
-                return(read.table(file, row.names = 1, sep = sep, header = FALSE, stringsAsFactors = FALSE))
-            }
+        
+        if (is.null(file)) 
+            return(NULL)
+        ext = toupper(substr(file, nchar(file)-2, nchar(file)))
+        if (ext == 'RDS') 
+            return(readRDS(file))
+        if (ext == 'MTX')
+            return(Matrix::readMM(file))
+        # handle different text formats
+        if (ext == 'TSV') 
+            sep = "\t"
+        else sep = ","
+        
+        # parse different formats of text file
+        if(file_type == 'expression_matrix'){
+            return(as.matrix(read.delim(file, row.names=1, sep = sep, stringsAsFactors = FALSE)))
+        } 
+        if (file_type == 'cell_metadata'){
+            # barcodes are provided as single column, can't use index
+            d = read.table(file, header = FALSE, sep = sep, stringsAsFactors = FALSE)
+            row.names(d) = d[,1]
+            return(d)
+        } 
+        if (file_type == 'gene_annotation') {
+            return(read.table(file, row.names = 1, header = FALSE, sep = sep, stringsAsFactors = FALSE))
         }
     }
     expression_matrix = .parse_input_data('expression_matrix')
+
+    print(head(expression_matrix))
+
     cell_metadata = .parse_input_data('cell_metadata')
+
+    print(head(cell_metadata))
+
     gene_annotation = .parse_input_data('gene_annotation')
 
+    print(head(gene_annotation))
+
     # matrix entries need to be named
-    row.names(expr_matrix) = row.names(gene_annotation)
-    colnames(expr_matrix) = row.names(cell_metadata)
+    row.names(expression_matrix) = row.names(gene_annotation)
+    colnames(expression_matrix) = row.names(cell_metadata)
 
     cds = new_cell_data_set(expression_matrix,
                             cell_metadata = cell_metadata,

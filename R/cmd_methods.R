@@ -139,7 +139,7 @@ monocle_create <- function(
         if ( file_type == 'expression_matrix' ){
             mat = as.matrix(read.delim(file, sep = sep, stringsAsFactors = FALSE, row.names = 1)) 
         }else{
-            mat = read.delim(file, sep = sep, stringsAsFactors = FALSE, row.names = NULL) 
+            mat = read.delim(file, sep = sep, stringsAsFactors = FALSE, row.names = NULL, header = FALSE, row.names = 1) 
             dim_to_check = ifelse(file_type == 'cell_metadata', 2, 1)
 
             expected_rows = dim(expression_matrix)[dim_to_check]
@@ -152,15 +152,6 @@ monocle_create <- function(
                     q(save = 'no', status = 1)
                 }
             }
-
-            # Move first column into rownames where possible
-
-            rownames(mat) <- mat[,1]
-            if (ncol(mat) > 1){
-                mat <- mat[,-1]
-            }
-
-            mat <- as.matrix(mat)
         }
     }
 

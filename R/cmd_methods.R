@@ -127,25 +127,43 @@ monocle_create <- function(
             return(readRDS(file))
         if (ext == 'MTX')
             return(Matrix::readMM(file))
+
         # handle different text formats
         if (ext == 'TSV') 
             sep = "\t"
         else sep = ","
-        
-        # parse different formats of text file
-        if(file_type == 'expression_matrix'){
-            return(as.matrix(read.delim(file, row.names=1, sep = sep, stringsAsFactors = FALSE)))
-        } 
-        if (file_type == 'cell_metadata'){
-            # barcodes are provided as single column, can't use index
-            d = read.table(file, header = FALSE, sep = sep, stringsAsFactors = FALSE)
-            row.names(d) = d[,1]
-            return(d)
-        } 
-        if (file_type == 'gene_annotation') {
-            return(read.table(file, row.names = 1, header = FALSE, sep = sep, stringsAsFactors = FALSE))
+
+        # Read file once, and adjust row/columns as appropriate before
+        # returning as matrix
+
+        if ( file_type == 'expression_matrix' ){
+            mat = as.matrix(read.delim(file, sep = sep, stringsAsFactors = FALSE, row.names = 1)) 
+        }else{
+            mat = read.delim(file, sep = sep, stringsAsFactors = FALSE, row.names = NULL) 
+            dim_to_check = ifelse(file_type == 'cell_metadata', 2, 1)
+
+            expected_rows = dim(expression_matrix)[dim_to_check]
+
+            if (nrows(mat) != expected_rows){
+                if (nrows(mat) - 1 == expected_rows){
+                    mat <- mat[-1,]
+                }else{
+                    message(paste('Number of', file_type, 'entries not appropriate to matrix.'))
+                    q(save = 'no', status = 1)
+                }
+            }
+
+            # Move first column into rownames where possible
+
+            rownames(mat) <- mat[,1]
+            if (ncol(mat) > 1){
+                mat <- mat[,-11]
+            }
+
+            mat <- as.matrix(mat)
         }
     }
+
     expression_matrix = .parse_input_data('expression_matrix')
     cell_metadata = .parse_input_data('cell_metadata')
     gene_annotation = .parse_input_data('gene_annotation')

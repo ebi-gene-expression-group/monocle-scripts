@@ -119,7 +119,7 @@ monocle_create <- function(
             stop(paste("Incorrect argument provided", file_type))
 
         file = createCDS_options[[file_type]]
-        
+
         if (is.null(file)) 
             return(NULL)
         ext = toupper(substr(file, nchar(file)-2, nchar(file)))
@@ -147,16 +147,8 @@ monocle_create <- function(
         }
     }
     expression_matrix = .parse_input_data('expression_matrix')
-
-    print(head(expression_matrix))
-
     cell_metadata = .parse_input_data('cell_metadata')
-
-    print(head(cell_metadata))
-
     gene_annotation = .parse_input_data('gene_annotation')
-
-    print(head(gene_annotation))
 
     # matrix entries need to be named
     row.names(expression_matrix) = row.names(gene_annotation)

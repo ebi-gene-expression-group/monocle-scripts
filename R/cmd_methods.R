@@ -158,7 +158,7 @@ monocle_create <- function(
     
     #a bit of 10x compatibility - the genes/features tsv file does not come with column names
     #generate some automatic column names
-    if (!is.null(file))
+    if (!is.null(createCDS_options[['gene_annotation']]))
     {
         if (basename(createCDS_options[['gene_annotation']]) == 'genes.tsv')
             colnames(gene_annotation) = c('gene_short_name')

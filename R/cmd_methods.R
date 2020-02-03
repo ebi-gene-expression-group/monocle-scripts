@@ -158,10 +158,13 @@ monocle_create <- function(
     
     #a bit of 10x compatibility - the genes/features tsv file does not come with column names
     #generate some automatic column names
-    if (basename(createCDS_options[['gene_annotation']]) == 'genes.tsv')
-        colnames(gene_annotation) = c('gene_short_name')
-    if (basename(createCDS_options[['gene_annotation']]) == 'features.tsv')
-        colnames(gene_annotation) = c('gene_short_name', 'feature_type')
+    if (!is.null(file))
+    {
+        if (basename(createCDS_options[['gene_annotation']]) == 'genes.tsv')
+            colnames(gene_annotation) = c('gene_short_name')
+        if (basename(createCDS_options[['gene_annotation']]) == 'features.tsv')
+            colnames(gene_annotation) = c('gene_short_name', 'feature_type')
+    }
 
     cds = new_cell_data_set(expression_matrix,
                             cell_metadata = cell_metadata,

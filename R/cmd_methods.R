@@ -108,11 +108,23 @@ monocle_create <- function(
     createCDS_options = list()
 ) {
 
+    #input checks. we need an expression matrix
     if (is.null(createCDS_options[['expression_matrix']]))
     {
         message('You need to provide the expression matrix by --expression-matrix. Aborting.')
         q(save = 'no', status = 1)
     }
+    
+    #if we've got an MTX, we need the cell/gene metadata
+    if (toupper(substr(createCDS_options[['expression_matrix']], nchar(createCDS_options[['expression_matrix']])-2, nchar(createCDS_options[['expression_matrix']]))) == 'MTX')
+    {
+        if (is.null(createCDS_options[['cell_metadata']]) | is.null(createCDS_options[['gene_annotation']]))
+        {
+            message('Need to have both --cell-metadata and --gene-annotation with an .mtx input for --expression-matrix. Aborting.')
+            q(save = 'no', status = 1)
+        }
+    }
+    
     #helper variable for dimension compatibility check later
     #a newly imported TSV/CSV's dimension 1 is compared against the count matrix dimension...?
     dims = list()
@@ -148,7 +160,7 @@ monocle_create <- function(
                         assign(var, as.matrix(read.delim(file, sep=sep, row.names = 1, header=FALSE, stringsAsFactors = FALSE)))
                     else
                     {
-                        message(paste('Dimensionality mismatch between',file,'and expression matrix. Exiting'))
+                        message(paste('Dimensionality mismatch between',file,'and expression matrix. Aborting.'))
                         q(save = 'no', status = 1)
                     }
                 }

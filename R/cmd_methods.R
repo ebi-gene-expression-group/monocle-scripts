@@ -113,9 +113,17 @@ monocle_create <- function(
         message('You need to provide the expression matrix by --expression-matrix. Aborting.')
         q(save = 'no', status = 1)
     }
+    #helper variable for dimension compatibility check later
+    #a newly imported TSV/CSV's dimension 1 is compared against the count matrix dimension...?
+    dims = list()
+    #introduces less logic downstream to just have it check itself
+    dims[['expression_matrix']] = 1
+    dims[['cell_metadata']] = 2
+    dims[['gene_annotation']] = 1
+    
     #the three constituents of the new_cell_data_set() call
     #are passed as arguments to the function, and live in this list
-    for (var in c('expression_matrix', 'cell_metadata', 'gene_annotation'))
+    for (var in c('expression_matrix','cell_metadata', 'gene_annotation'))
     {
         file = createCDS_options[[var]]
         if (is.null(file))
@@ -126,11 +134,36 @@ monocle_create <- function(
                 assign(var, readRDS(file))
             else if (toupper(substr(file, nchar(file)-2, nchar(file))) == 'MTX')
                 assign(var, Matrix::readMM(file))
-            else if (toupper(substr(file, nchar(file)-2, nchar(file))) == 'TSV')
-                assign(var, as.matrix(read.delim(file, row.names = 1, stringsAsFactors = FALSE)))
             else
-                assign(var, as.matrix(read.csv(file, row.names = 1, stringsAsFactors = FALSE)))
+            {
+                #select correct delimiter for tsv or csv file
+                sep=','
+                if (toupper(substr(file, nchar(file)-2, nchar(file))) == 'TSV')
+                    sep='\t'
+                assign(var, as.matrix(read.delim(file, sep=sep, row.names = 1, stringsAsFactors = FALSE)))
+                #dimensionality check to account for the possible lack of a header
+                if (dim(get(var))[1] != dim(expression_matrix)[dims[[var]]])
+                {
+                    if (dim(get(var))[1] == dim(expression_matrix)[dims[[var]]]-1)
+                        assign(var, as.matrix(read.delim(file, sep=sep, row.names = 1, header=FALSE, stringsAsFactors = FALSE)))
+                    else
+                    {
+                        message(paste('Dimensionality mismatch between',file,'and expression matrix. Exiting'))
+                        q(save = 'no', status = 1)
+                    }
+                }
+            }
         }
+    }
+    
+    #a bit of 10x compatibility - the genes/features tsv file does not come with column names
+    #generate some automatic column names
+    if (!is.null(createCDS_options[['gene_annotation']]))
+    {
+        if (basename(createCDS_options[['gene_annotation']]) == 'genes.tsv')
+            colnames(gene_annotation) = c('gene_short_name')
+        if (basename(createCDS_options[['gene_annotation']]) == 'features.tsv')
+            colnames(gene_annotation) = c('gene_short_name', 'feature_type')
     }
 
     cds = new_cell_data_set(expression_matrix,

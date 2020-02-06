@@ -20,6 +20,11 @@ setup() {
     csv_file="${test_dir}/matrix.csv"
     csv_opt="--expression-matrix $csv_file"
     csv_rds="${output_dir}/csv.rds"
+    x10x_mtx="${test_dir}/matrix.mtx"
+    x10x_cell="${test_dir}/barcodes.tsv"
+    x10x_gene="${test_dir}/genes.tsv"
+    x10x_opt="--expression-matrix $x10x_mtx --cell-metadata $x10x_cell --gene-annotation $x10x_gene"
+    x10x_rds="${output_dir}/10x.rds"
     preprocess_opt="-f cds3 --method PCA --num-dim 50 --norm-method log --pseudo-count 1"
     preprocess_rds="${output_dir}/preprocess.rds"
     reduceDim_opt="--max-components 2 --reduction-method UMAP --preprocess-method PCA"
@@ -100,6 +105,18 @@ setup() {
     
     [ "$status" -eq 0 ]
     [ -f "$tsv_rds" ]
+}
+
+@test "Create from 10X .mtx/.tsv" {
+    if [ "$resume" = 'true' ] && [ -f "$x10x_rds" ]; then
+        skip "$x10x_rds exists and resume is set to 'true'"
+    fi
+    
+    echo "$monocle create $x10x_rds $x10x_opt"
+    run eval "printf '%%%%MatrixMarket matrix coordinate integer general\n%%\n2 2 4\n1 1 1\n2 1 1\n1 2 1\n2 2 1\n' > $x10x_mtx && printf 'AAACCTGAGATCCTGT-1\nAAACCTGCACCTCGGA-1\n' > $x10x_cell && printf 'ENSG00000243485\tRP11-34P13.3\nENSG00000237613\tFAM138A\n' > $x10x_gene" && $monocle create $x10x_rds $x10x_opt
+    
+    [ "$status" -eq 0 ]
+    [ -f "$x10x_rds" ]
 }
 
 # Preprocess data

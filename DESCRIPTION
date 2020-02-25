@@ -1,6 +1,6 @@
 Package: MonocleScripts
 Title: Command line scripts for Monocle3
-Version: 0.0.6
+Version: 0.0.7
 Authors@R: c(
     person('Ni', 'Huang', email='nh3@users.noreply.github.com', role=c('aut', 'cre')),
     person('Krzysztof', 'Polanski', email='ktpolanski@users.noreply.github.com', role='aut'))

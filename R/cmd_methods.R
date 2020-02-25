@@ -140,7 +140,7 @@ monocle_create <- function(
                 sep=','
                 if (toupper(substr(file, nchar(file)-2, nchar(file))) == 'TSV')
                     sep='\t'
-                assign(var, as.matrix(read.delim(file, sep=sep, row.names = 1, stringsAsFactors = FALSE)))
+                assign(var, as.matrix(read.delim(file, sep=sep, row.names = 1, stringsAsFactors = FALSE, check.names=FALSE)))
                 #dimensionality check to account for the possible lack of a header
                 if (dim(get(var))[1] != dim(expression_matrix)[dims[[var]]])
                 {

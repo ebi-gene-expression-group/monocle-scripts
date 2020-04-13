@@ -121,7 +121,10 @@ function_options <- function(func_names) {
                 action = 'store',
                 type = 'character',
                 metavar = 'STR',
-                help = 'Expression matrix, genes as rows, cells as columns. Required input. Provide as TSV, CSV, RDS or MTX. In the case of MTX, requires both --cell-metadata and --gene-annotation.'
+                help = paste(
+                    'Expression matrix, genes as rows, cells as columns. Required input. ',
+                    'Provide as TSV, CSV, RDS or MTX. In the case of MTX,',
+                    'requires both --cell-metadata and --gene-annotation.'
             ),
             make_option(
                 c('--cell-metadata'),
@@ -129,7 +132,10 @@ function_options <- function(func_names) {
                 type = 'character',
                 default = NULL,
                 metavar = 'STR',
-                help = 'Per-cell annotation, optional unless expression as MTX. Row names must match the column names of the expression matrix. Provide as TSV, CSV or RDS.'
+                help = paste(
+                    'Per-cell annotation, optional unless expression as MTX.',
+                    'Row names must match the column names of the expression matrix.',
+                    'Provide as TSV, CSV or RDS.'
             ),
             make_option(
                 c('--gene-annotation'),
@@ -137,7 +143,9 @@ function_options <- function(func_names) {
                 type = 'character',
                 default = NULL,
                 metavar = 'STR',
-                help = 'Per-gene annotation, optional unless expression as MTX. Row names must match the row names of the expression matrix. Provide as TSV, CSV or RDS.'
+                help = paste(
+                    'Per-gene annotation, optional unless expression as MTX.',
+                    'Row names must match the row names of the expression matrix. Provide as TSV, CSV or RDS.'
             )
         ),
         
@@ -712,22 +720,22 @@ function_options <- function(func_names) {
         ),
         
         #' Command line arguments for monocle_top_markers
-        top_markers = list(
+        topMarkers = list(
             make_option(
                 c('--group-cells-by'),
                 action = 'store',
                 type = 'character',
                 default = 'cluster',
                 help = paste(
-                    'Group by cells',
-                    'choose from {cluster, partition, or any categorical variable in colData(cds)}. [Default: %default]'
+                    'Cell groups, choose from "cluster", "partition", or any categorical variable',
+                    'in `colData(cds)`}. [Default: %default]'
                 )
             ),
             make_option(
                 c('--genes-to-test-per-group'),
                 action = 'store',
                 type = 'integer',
-                default = NULL,
+                default = 25,
                 help = paste(
                     'Numeric, how many genes of the top ranked specific genes by Jenson-Shannon',
                     'to do the more expensive regression test on. [Default: %default]'
@@ -750,9 +758,10 @@ function_options <- function(func_names) {
                 type = 'character',
                 default = NULL,
                 help = paste(
-                    'If provided, top_markers will perform the marker significance test against a "reference set"',
-                    'of cells. Must be either a list of cell ids from colnames(cds) (comma separated), or a positive integer.',
-                    'If the latter, top_markers() will randomly select the specified number of reference cells.',
+                    'If provided, top_markers will perform the marker significance test against a',
+                    '"reference set" of cells. Must be either a list of cell ids from colnames(cds)',
+                    '(comma separated), or a positive integer. If the latter, top_markers() will',
+                    'randomly select the specified number of reference cells.',
                     'Accelerates the marker significance test at some cost in sensitivity.'
                 )
             ),
@@ -775,7 +784,7 @@ function_options <- function(func_names) {
                 help = 'Filters the markers test result by this fraction of expression [Default: %default]'
             ),
             make_option(
-                c('--top-n'),
+                c('--top-n-markers'),
                 action = 'store',
                 type = 'integer',
                 default = 5,
@@ -783,9 +792,21 @@ function_options <- function(func_names) {
                     'The number of top marker genes to report in plots and in top markers list.',
                     '[Default: %default]'
                 )
+            ),
+            make_option(
+                c('--plot-top-markers'),
+                action = 'store',
+                type = 'character',
+                default = NULL,
+                help = 'Save top marker by cell group plot to a file specified by this option.'
+            ),
+            make_option(
+                c('--save-full-markers'),
+                action = 'store',
+                type = 'character',
+                default = NULL,
+                help = 'Save full marker table to a file specified by this option.'
             )
-            # Do we need to add and output_plot option or is it inherited?
-            # I have two tables results, how do I use the ouput_table here in flexible way?
         )
     )
 

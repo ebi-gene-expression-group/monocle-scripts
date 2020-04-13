@@ -710,6 +710,83 @@ function_options <- function(func_names) {
                 )
             )
         )
+        
+        #' Command line arguments for monocle_top_markers
+        top_markers = list(
+            make_option(
+                c('--group-cells-by'),
+                action = 'store',
+                type = 'character',
+                default = 'cluster',
+                help = paste(
+                    'Group by cells',
+                    'choose from {cluster, partition, or any categorical variable in colData(cds)}. [Default: %default]'
+                )
+            ),
+            make_option(
+                c('--genes-to-test-per-group'),
+                action = 'store',
+                type = 'integer',
+                default = NULL,
+                help = paste(
+                    'Numeric, how many genes of the top ranked specific genes by Jenson-Shannon',
+                    'to do the more expensive regression test on. [Default: %default]'
+                )
+            ),
+            make_option(
+                c('--marker-sig-test'),
+                action = 'store_true',
+                type = 'logical',
+                default = FALSE,
+                help = paste(
+                    'A flag indicating whether to assess the discriminative power of each marker', 
+                    'through logistic regression. Can be slow, consider disabling to speed up top_markers().',
+                    '[Default: %default]'
+                )
+            ),
+            make_option(
+                c('--reference-cells'),
+                action = 'store',
+                type = 'character',
+                default = NULL,
+                help = paste(
+                    'If provided, top_markers will perform the marker significance test against a "reference set"',
+                    'of cells. Must be either a list of cell ids from colnames(cds) (comma separated), or a positive integer.',
+                    'If the latter, top_markers() will randomly select the specified number of reference cells.'
+                    'Accelerates the marker significance test at some cost in sensitivity.'
+                )
+            ),
+            make_option(
+                c('--cores'),
+                action = 'store',
+                type = 'integer',
+                default = 1,
+                help = paste(
+                    'The number of cores to be used for marker testing.',
+                    '[Default: %default]'
+                )
+            ),
+            make_option(
+                c('--filter-fraction-expression'),
+                action = 'store',
+                type = 'numeric',
+                default = 0.10,
+                metavar = 'FLOAT',
+                help = 'Filters the markers test result by this fraction of expression [Default: %default]'
+            ),
+            make_option(
+                c('--top-n'),
+                action = 'store',
+                type = 'integer',
+                default = 5,
+                help = paste(
+                    'The number of top marker genes to report in plots and in top markers list.',
+                    '[Default: %default]'
+                )
+            )
+            # Do we need to add and output_plot option or is it inherited?
+            # I have two tables results, how do I use the ouput_table here in flexible way?
+        )
     )
 
     if (!is.null(func_names) && !is.na(func_names)) {

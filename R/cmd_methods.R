@@ -352,3 +352,74 @@ monocle_plotCells <- function(
 
     monocle_write_plot(p, output_plot, output_plot_format)
 }
+
+#' @name monocle_top_markers
+#' 
+#' @importFrom monocle3 top_markers
+monocle_top_markers <- function(
+    input_object,
+    group_cells_by = "cluster",
+    genes_to_test_per_group = 25,
+    marker_sig_test = TRUE,
+    reference_cells = NULL,
+    cores = 1,
+    verbose = FALSE,
+    filter_fraction_expression = 0.10,
+    top_n = 5,
+    output_plot = NULL,
+    output_plot_format = 'png',
+    output_marker_test_res,
+    output_marker_test_res_format = 'tsv',
+    output_top_markers = NULL,
+    output_top_markers_format = 'tsv'
+) {
+    # reference_cells can be a list or a number
+    # if it is a list, it will come as a comma separated enumeration
+    # of cell identifiers as available in 
+    # colnames(cds).
+    if !is.null(reference_cells) ) {
+        if( !is.na(as.numeric(reference_cells)) ) {
+            reference_cells<-as.numeric(reference_cells)
+        } else {
+            reference_cells<-strsplit(reference_cells, ',')
+            reference_cells<-reference_cells[reference_cells %in% colnames(input_object)]
+        }
+    }
+
+    marker_test_res <- top_markers(input_object, 
+                                   group_cells_by=group_cells_by, 
+                                   genes_to_test_per_group=genes_to_test_per_group,
+                                   marker_sig_test=marker_sig_test,
+                                   reference_cells=reference_cells,
+                                   cores=cores,
+                                   verbose=verbose
+                                   )
+    top_markers <- marker_test_res %>%
+        filter(fraction_expressing >= filter_fraction_expression) %>%
+        group_by(cell_group) %>%
+        top_n(top_n, pseudo_R2) %>% 
+        arrange(cell_group)
+    
+    if( !is.null(output_plot) ) {
+        top_marker_ids <- unique(top_markers %>% pull(gene_id))
+        p<-plot_genes_by_group(input_object,
+                        top_marker_ids,
+                        ordering_type="maximal_on_diag",
+                        max.size=3)
+        monocle_write_plot(p, output_plot, output_plot_format)
+    }
+    
+    monocle_write_table(tbl=marker_test_res, 
+                        output_table=output_marker_test_res,
+                        output_table_format = output_marker_test_res_format, 
+                        introspective = FALSE
+                        )
+    
+    if( !is.null(output_top_markers)) {
+        write.table(, file=output_top_markers, sep="\t")
+        monocle_write_table(tbl=top_markers,
+                            output_table=output_top_markers,
+                            output_table_format=output_top_markers_format
+                            )
+    }
+}

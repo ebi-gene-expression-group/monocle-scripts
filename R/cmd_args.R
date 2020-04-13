@@ -125,6 +125,7 @@ function_options <- function(func_names) {
                     'Expression matrix, genes as rows, cells as columns. Required input. ',
                     'Provide as TSV, CSV, RDS or MTX. In the case of MTX,',
                     'requires both --cell-metadata and --gene-annotation.'
+                )
             ),
             make_option(
                 c('--cell-metadata'),
@@ -136,6 +137,7 @@ function_options <- function(func_names) {
                     'Per-cell annotation, optional unless expression as MTX.',
                     'Row names must match the column names of the expression matrix.',
                     'Provide as TSV, CSV or RDS.'
+                )
             ),
             make_option(
                 c('--gene-annotation'),
@@ -146,6 +148,7 @@ function_options <- function(func_names) {
                 help = paste(
                     'Per-gene annotation, optional unless expression as MTX.',
                     'Row names must match the row names of the expression matrix. Provide as TSV, CSV or RDS.'
+                )
             )
         ),
         

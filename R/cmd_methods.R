@@ -373,11 +373,12 @@ monocle_top_markers <- function(
     output_top_markers = NULL,
     output_top_markers_format = 'tsv'
 ) {
+    suppressPackageStartupMessages(library(dplyr))
     # reference_cells can be a list or a number
     # if it is a list, it will come as a comma separated enumeration
     # of cell identifiers as available in 
     # colnames(cds).
-    if !is.null(reference_cells) ) {
+    if( !is.null(reference_cells) ) {
         if( !is.na(as.numeric(reference_cells)) ) {
             reference_cells<-as.numeric(reference_cells)
         } else {

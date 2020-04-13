@@ -37,7 +37,7 @@ generate_command_spec <- function() {
             'principalGraphTest',
             'plot_cell_trajectory'
         ),
-        type = c('o','io', 'io', 'io', 'itp', 'io', 'io', 'it', 'ip'),
+        type = c('o','io', 'io', 'io', 'it', 'io', 'io', 'it', 'ip'),
         stringsAsFactors = FALSE
     )
     rownames(command_spec) <- command_spec$name
@@ -362,7 +362,7 @@ monocle_plotCells <- function(
 #' @name monocle_topMarkers
 #'
 #' @importFrom monocle3 top_markers plot_genes_by_group
-#' @import dplyr
+#' @importFrom dplyr arrange top_n group_by filter pull
 
 monocle_topMarkers <- function(
     input_object,
@@ -400,22 +400,27 @@ monocle_topMarkers <- function(
         c(list(cds, verbose = verbose), topMarkers_options)
     )
 
-    top_marker_test_res <- marker_test_res %>%
-        filter(fraction_expressing >= filter_fraction_expression) %>%
-        group_by(cell_group) %>%
-        top_n(top_n_markers, pseudo_R2) %>%
-        arrange(cell_group)
+    if (topMarkers_options[['marker_sig_test']]) {
+        top_marker_test_res <- arrange(top_n(group_by(filter(
+            marker_test_res, fraction_expressing >= filter_fraction_expression
+        ), cell_group), top_n_markers, pseudo_R2), cell_group)
+    } else {
+        top_marker_test_res <- arrange(top_n(group_by(filter(
+            marker_test_res, fraction_expressing >= filter_fraction_expression
+        ), cell_group), top_n_markers, marker_score), cell_group)
+    }
 
     monocle_write_table(top_marker_test_res, output_table, output_table_format, introspective)
 
     if (!is.null(plot_top_markers)) {
         output_plot_format <- ifelse(grepl('[.]pdf$', plot_top_markers), 'pdf', 'png')
-        top_marker_ids <- unique(top_marker_test_res %>% pull(gene_id))
+        top_marker_ids <- unique(pull(top_marker_test_res, gene_id))
         p <- plot_genes_by_group(
             cds,
             top_marker_ids,
             group_cells_by = topMarkers_options[['group_cells_by']],
-            ordering_type = "maximal_on_diag",
+            ordering_type = ifelse(top_n_markers==1, 'maximal_on_diag', 'cluster_row_col'),
+            axis_order = 'group_marker',
             max.size = 3
         )
         monocle_write_plot(p, plot_top_markers, output_plot_format)

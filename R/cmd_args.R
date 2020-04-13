@@ -709,7 +709,7 @@ function_options <- function(func_names) {
                     'If set, label the branch points of the principal graph.'
                 )
             )
-        )
+        ),
         
         #' Command line arguments for monocle_top_markers
         top_markers = list(

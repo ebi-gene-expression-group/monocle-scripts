@@ -417,7 +417,6 @@ monocle_top_markers <- function(
                         )
     
     if( !is.null(output_top_markers)) {
-        write.table(, file=output_top_markers, sep="\t")
         monocle_write_table(tbl=top_markers,
                             output_table=output_top_markers,
                             output_table_format=output_top_markers_format

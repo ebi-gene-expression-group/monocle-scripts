@@ -31,6 +31,10 @@ setup() {
     reduceDim_rds="${output_dir}/reduceDim.rds"
     partition_opt="--knn 20 --louvain-iter 1"
     partition_rds="${output_dir}/partition.rds"
+    topMarkers_tbl="${output_dir}/topMarkers_top.tsv"
+    topMarkers_png="${output_dir}/topMarkers_top.png"
+    topMarkers_full_tbl="${output_dir}/topMarkers_full.tsv"
+    topMarkers_opt="-f cds3 -F tsv --plot-top-markers $topMarkers_png --save-full-markers $topMarkers_full_tbl"
     learnGraph_opt="--minimal-branch-len 15"
     learnGraph_rds="${output_dir}/learnGraph.rds"
     orderCells_opt="--cell-phenotype embryo.time.bin --root-type 130-170 --reduction-method UMAP"
@@ -159,6 +163,22 @@ setup() {
 
     [ "$status" -eq 0 ]
     [ -f "$partition_rds" ]
+}
+
+# Get top markers
+
+@test "TopMarkers" {
+    if [ "$resume" = 'true' ] && [ -f "$topMarkers_tbl" ] && [ -f "$topMarkers_png" ] && [ -f "$topMarkers_full_tbl" ]; then
+        skip "$topMarkers_tbl exists and resume is set to 'true'"
+    fi
+
+    echo "$monocle topMarkers $topMarkers_opt $partition_rds $topMarkers_tbl"
+    run $monocle topMarkers $topMarkers_opt $partition_rds $topMarkers_tbl
+
+    [ "$status" -eq 0 ]
+    [ -f "$topMarkers_tbl" ]
+    [ -f "$topMarkers_png" ]
+    [ -f "$topMarkers_full_tbl" ]
 }
 
 # Learn graph

@@ -624,7 +624,7 @@ function_options <- function(func_names) {
             ),
             make_option(
                 c('--genes'),
-                action = 'store',
+                action = 'callback',
                 type = 'character',
                 default = NULL,
                 metavar = 'STR',

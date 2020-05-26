@@ -24,6 +24,14 @@ check_choose_from <- function(choices) {
     }
 }
 
+#' Parse a string of comma-separated values into a vector
+parse_comma_separated_values <- function(sep = ',') {
+    function(opt, opt_flag, opt_value, parser, sep. = sep) {
+        strsplit(opt_value, sep., fixed = T)[[1]]
+    }
+}
+
+
 #' Take a list of options and positional arguments, and parse the command line
 get_opts <- function(arguments, args) {
     k_opts <- sapply(arguments, class) == 'OptionParserOption'

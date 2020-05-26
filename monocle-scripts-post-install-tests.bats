@@ -42,6 +42,7 @@ setup() {
     diffExp_opt="-F tsv --knn 25 --method Moran_I --alternative greater --cores 2"
     diffExp_tbl="${output_dir}/diffExp.tsv"
     plotCells_opt="-F png --xdim 2 --ydim 1 --color-cells-by pseudotime --reduction-method UMAP --cell-size 1 --alpha 0.2"
+    plotCells_opt_multiple_genes=$plotCells_opt" --genes nduo-1,nduo-6,ctb-1"
     plotCells_plt="${output_dir}/plotCells.png"
 
     if [ ! -e "$output_dir" ]; then
@@ -232,6 +233,18 @@ setup() {
 
     echo "$monocle plotCells $plotCells_opt $orderCells_rds $plotCells_plt"
     run $monocle plotCells $plotCells_opt $orderCells_rds $plotCells_plt
+
+    [ "$status" -eq 0 ]
+    [ -f "$plotCells_plt" ]
+}
+
+@test "PlotCells multiple genes" {
+    if [ "$resume" = 'true' ] && [ -f "$plotCells_plt" ]; then
+        skip "$plotCells_plt exists and resume is set to 'true'"
+    fi
+
+    echo "$monocle plotCells $plotCells_opt_multiple_genes $orderCells_rds $plotCells_plt"
+    run $monocle plotCells $plotCells_opt_multiple_genes $orderCells_rds $plotCells_plt
 
     [ "$status" -eq 0 ]
     [ -f "$plotCells_plt" ]

@@ -43,6 +43,8 @@ setup() {
     diffExp_tbl="${output_dir}/diffExp.tsv"
     plotCells_opt="-F png --xdim 2 --ydim 1 --color-cells-by pseudotime --reduction-method UMAP --cell-size 1 --alpha 0.2"
     plotCells_plt="${output_dir}/plotCells.png"
+    plotCells_opt_multiple_genes="-F png --xdim 2 --ydim 1 --genes nduo-1,nduo-6,ctb-1 --reduction-method UMAP --cell-size 1 --alpha 0.2"
+    plotCells_multi_plt="${output_dir}/plotCells_multiGene.png"
 
     if [ ! -e "$output_dir" ]; then
         mkdir -p $output_dir
@@ -235,6 +237,18 @@ setup() {
 
     [ "$status" -eq 0 ]
     [ -f "$plotCells_plt" ]
+}
+
+@test "PlotCells multiple genes" {
+    if [ "$resume" = 'true' ] && [ -f "$plotCells_multi_plt" ]; then
+        skip "$plotCells_multi_plt exists and resume is set to 'true'"
+    fi
+
+    echo "$monocle plotCells $plotCells_opt_multiple_genes $orderCells_rds $plotCells_multi_plt"
+    run $monocle plotCells $plotCells_opt_multiple_genes $orderCells_rds $plotCells_multi_plt
+
+    [ "$status" -eq 0 ]
+    [ -f "$plotCells_multi_plt" ]
 }
 
 # Local Variables:

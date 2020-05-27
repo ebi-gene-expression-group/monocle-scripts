@@ -624,12 +624,13 @@ function_options <- function(func_names) {
             ),
             make_option(
                 c('--genes'),
-                action = 'store',
+                action = 'callback',
                 type = 'character',
                 default = NULL,
                 metavar = 'STR',
+                callback = parse_comma_separated_values(),
                 help = paste(
-                    'A list of gene IDs/short names to plot, one per panel.'
+                    'A comma-separated list of gene IDs/short names to plot, one per panel.'
                 )
             ),
             make_option(
